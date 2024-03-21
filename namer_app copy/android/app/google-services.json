@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "587973743901",
+    "project_id": "cobuilder-48773",
+    "storage_bucket": "cobuilder-48773.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587973743901:android:0b8ca383fe5038bc2b3df4",
+        "android_client_info": {
+          "package_name": "com.example.namer_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlzfRumqsg5JqTEnHbS-NpVlgbSGr41wY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
