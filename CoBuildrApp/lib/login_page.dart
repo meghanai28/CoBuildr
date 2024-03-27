@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
+import 'package:namer_app/main.dart';
+import 'package:provider/provider.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key : key); 
@@ -19,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter, 
-              colors: [Color.fromARGB(255, 84, 1, 109), Color.fromARGB(255, 31, 3, 188)],
+              colors: [Color.fromRGBO(84, 1, 109, 1), Color.fromARGB(255, 31, 3, 188)],
               ),
           ),
         child: Center(
@@ -95,6 +97,11 @@ class _LoginPageState extends State<LoginPage> {
           //sign in button
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: GestureDetector(
+              onTap: () {
+                Provider.of<MyAppState>(context, listen: false).login();
+              },
+            
             child: Container(
               padding: EdgeInsets.all(25), 
               decoration: BoxDecoration(
@@ -112,6 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                 ), 
               )
             ),
+          ),
           ),
           SizedBox(height: 15),
 
