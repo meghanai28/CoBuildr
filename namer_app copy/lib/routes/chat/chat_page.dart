@@ -37,7 +37,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Build a list of users with whom the current user has chat messages
+  // build list of users that user is currently chatting with
   Widget _buildUserList() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
@@ -79,12 +79,13 @@ class _ChatPageState extends State<ChatPage> {
                       },
                     );
                   } else {
+                    // empty
                     return Container();
                   }
                 },
               );
             } else {
-              // Exclude current user from the list
+              // empty
               return Container();
             }
           },
