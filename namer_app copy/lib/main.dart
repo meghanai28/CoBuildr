@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(), // LoginPage route
         '/signup': (context) => SignupPage(), // SignupPage route
         '/home' : (context) => HomePage(), // HomePage route
-        '/chat' : (context) => ChatPage(),
-        // You can add more routes here as needed
+        '/chat' : (context) => ChatPage(), // ChatPage route
+        
       },
     );
   }
