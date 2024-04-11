@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:namer_app/routes/chat/chat_details.dart';
+import 'package:namer_app/services/chat_service.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -112,6 +113,7 @@ class _ChatPageState extends State<ChatPage> {
   void _showNewChatDialog(BuildContext context) {
     TextEditingController emailController = TextEditingController();
     TextEditingController messageController = TextEditingController();
+    ChatService service = ChatService();
 
     showDialog(
       context: context,
@@ -149,7 +151,7 @@ class _ChatPageState extends State<ChatPage> {
                   onPressed: () async {
                     final recipientUserId = await _getUserUidByEmail(emailController.text);
                     if (recipientUserId != null) {
-                      await _sendMessage(emailController.text, messageController.text);
+                      await service.sendMessage(recipientUserId, messageController.text);
                       Navigator.of(context).pop();
                       Navigator.pushNamed(context, '/chat');
                     } else {
@@ -168,36 +170,6 @@ class _ChatPageState extends State<ChatPage> {
         );
       },
     );
-  }
-
-  // Send message and update chat page
-  Future<void> _sendMessage(String recipientEmail, String message) async {
-    final recipientUserId = await _getUserUidByEmail(recipientEmail);
-    if (recipientUserId != null) {
-      final currentUser = _auth.currentUser!;
-      final Timestamp timestamp = Timestamp.now();
-
-      // Create a new message
-      Map<String, dynamic> newMessage = {
-        'senderId': currentUser.uid,
-        'senderEmail': currentUser.email!,
-        'recieverId': recipientUserId,
-        'message': message,
-        'timestamp': timestamp,
-      };
-
-      // Construct chat room id from user ids (sort to ensure uniqueness)
-      List<String> ids = [currentUser.uid, recipientUserId];
-      ids.sort();
-      String chatRoomId = ids.join("_");
-
-      // Add message to Firestore
-      await FirebaseFirestore.instance
-          .collection('chat_rooms')
-          .doc(chatRoomId)
-          .collection('messages')
-          .add(newMessage);
-    }
   }
 
   // Get user UID by email
