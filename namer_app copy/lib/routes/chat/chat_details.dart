@@ -25,6 +25,7 @@ class _ChatDetailsState extends State<ChatDetails> {
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  ScrollController _scrollController = ScrollController();
 
   void sendMessage() async {
     if (_messageController.text.isNotEmpty){
@@ -67,7 +68,18 @@ class _ChatDetailsState extends State<ChatDetails> {
           return const Text('loading');
         }
 
+        WidgetsBinding.instance?.addPostFrameCallback((_) 
+        {
+          _scrollController.animateTo
+          (
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        });
+
         return ListView(
+          controller: _scrollController, 
           children: snapshot.data!.docs.map((document)=> _buildMessageItem(document)).toList(),
         );
       }

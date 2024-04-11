@@ -177,7 +177,6 @@ class _ChatPageState extends State<ChatPage> {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
-        .limit(1)
         .get();
     return querySnapshot.docs.isNotEmpty ? querySnapshot.docs.first.id : null;
   }
