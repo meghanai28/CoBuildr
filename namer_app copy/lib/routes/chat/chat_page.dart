@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:namer_app/routes/chat/chat_details.dart';
 import 'package:namer_app/services/chat_service.dart';
 
