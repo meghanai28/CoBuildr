@@ -18,6 +18,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Chat Page'),
       ),
       body: Column(
@@ -95,14 +96,13 @@ class _ChatPageState extends State<ChatPage> {
   // Check if the current user has chat messages with a specific user
   Future<bool> _hasChatMessages(String otherUserId) async {
     final currentUserUid = _auth.currentUser!.uid;
-    final chatRoomId = [currentUserUid, otherUserId].toList()..sort();
+    final chatRoomId = [currentUserUid, otherUserId];
+    chatRoomId.sort();
     final chatRoomIdString = chatRoomId.join('_');
     final querySnapshot = await FirebaseFirestore.instance
         .collection('chat_rooms')
         .doc(chatRoomIdString)
         .collection('messages')
-        .where('senderId', isEqualTo: currentUserUid)
-        .limit(1)
         .get();
 
     return querySnapshot.docs.isNotEmpty;
@@ -151,6 +151,7 @@ class _ChatPageState extends State<ChatPage> {
                     if (recipientUserId != null) {
                       await _sendMessage(emailController.text, messageController.text);
                       Navigator.of(context).pop();
+                      Navigator.pushNamed(context, '/chat');
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
