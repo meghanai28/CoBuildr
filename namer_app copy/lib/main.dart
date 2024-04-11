@@ -3,8 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'routes/welcome_page.dart';
+import 'routes/login_page.dart';
+import 'routes/signup_page.dart';
+import 'routes/home_page.dart';
+import 'routes/chat/chat_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
   // initalize firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -14,165 +21,24 @@ void main() async{
   
 }
 
-class MyApp extends StatelessWidget { //widgets = elements you build every flutter app with 
-  const MyApp({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'Namer App',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 4, 68, 30)),
-        ),
-        home: MyHomePage(),
+    return MaterialApp(
+      title: 'Welcome App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-    );
-  }
-}
-
-class MyAppState extends ChangeNotifier { //defines app state, changenotifier= notifies others of its own changes
-  var current = WordPair.random();
-
-  void getNext() {
-    current = WordPair.random(); 
-    notifyListeners(); 
-  }
-
-  var favorites = <WordPair>[]; //wordpair generics used to specify list can only ever contain word pairs
-
-  void toggleFavorite() {
-    if(favorites.contains(current)) {
-      favorites.remove(current); 
-    } else {
-      favorites.add(current); 
-    }
-    notifyListeners(); 
-  }
-
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  var selectedIndex = 0; 
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      body: Row(
-        children: [
-          SafeArea( //child is not obscured by a hardware notch or status bar 
-            child: NavigationRail(
-              extended: true,
-              destinations: [
-                NavigationRailDestination(
-                  icon: Icon(Icons.home),
-                  label: Text('Home'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.favorite),
-                  label: Text('Favorites'),
-                ),
-              ],
-              selectedIndex: selectedIndex,
-              onDestinationSelected: (value) {
-                setState(() {
-                  selectedIndex = value; 
-                }); 
-                
-              },
-            ),
-          ),
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: GeneratorPage(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class GeneratorPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
-
-    IconData icon;
-    if (appState.favorites.contains(pair)) {
-      icon = Icons.favorite;
-    } else {
-      icon = Icons.favorite_border;
-    }
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          BigCard(pair: pair),
-          SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  appState.toggleFavorite();
-                },
-                icon: Icon(icon),
-                label: Text('Like'),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  appState.getNext();
-                },
-                child: Text('Next'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-class BigCard extends StatelessWidget {
-  const BigCard({
-    super.key,
-    required this.pair,
-  });
-
-  final WordPair pair;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context); 
-    final style = theme.textTheme.displayMedium!.copyWith(
-      color : theme.colorScheme.onPrimary,
-    ); 
-
-    return Card(
-      color: theme.colorScheme.primary,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Text(
-          pair.asLowerCase, 
-          style: style,
-          semanticsLabel: "${pair.first} ${pair.second}",
-          ),
-      ),
+      initialRoute: '/welcome', // Set the initial route to WelcomePage
+      routes: {
+        '/welcome': (context) => WelcomePage(), // WelcomePage route
+        '/login': (context) => LoginPage(), // LoginPage route
+        '/signup': (context) => SignupPage(), // SignupPage route
+        '/home' : (context) => HomePage(), // HomePage route
+        '/chat' : (context) => ChatPage(),
+        // You can add more routes here as needed
+      },
     );
   }
 }
