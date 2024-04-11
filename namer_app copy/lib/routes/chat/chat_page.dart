@@ -61,7 +61,7 @@ class _ChatPageState extends State<ChatPage> {
                 future: _hasChatMessages(userData['uid']),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const Text('Loading');
                   }
                   final hasChatMessages = snapshot.data ?? false;
                   if (hasChatMessages) {
