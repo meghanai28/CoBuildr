@@ -94,7 +94,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Check if the current user has chat messages with a specific user
+  // check if the current user is chatting w a given user
   Future<bool> _hasChatMessages(String otherUserId) async {
     final currentUserUid = _auth.currentUser!.uid;
     final chatRoomId = [currentUserUid, otherUserId];
@@ -109,7 +109,7 @@ class _ChatPageState extends State<ChatPage> {
     return querySnapshot.docs.isNotEmpty;
   }
 
-  // Show a popup dialog for creating a new chat
+  // popup dialog for creating a new chat
   void _showNewChatDialog(BuildContext context) {
     TextEditingController emailController = TextEditingController();
     TextEditingController messageController = TextEditingController();
@@ -172,7 +172,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Get user UID by email
+  // given email get uid
   Future<String?> _getUserUidByEmail(String email) async {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('users')
