@@ -12,8 +12,7 @@ class _SignupPageState extends State<SignupPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   String? _selectedUserType;
   String _message = '';
 
