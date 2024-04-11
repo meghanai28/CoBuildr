@@ -65,7 +65,7 @@ class _ChatDetailsState extends State<ChatDetails> {
           return const Text('loading');
         }
 
-        WidgetsBinding.instance?.addPostFrameCallback((_) 
+        WidgetsBinding.instance.addPostFrameCallback((_) 
         {
           _scrollController.animateTo
           (
