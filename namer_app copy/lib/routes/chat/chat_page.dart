@@ -8,31 +8,34 @@ class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
 
   @override
-  State<ChatPage> createState() => _ChatPageState();
+  State<ChatPage> createState() => _ChatPageState(); // create the state
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance; // create instance of authentication (used when user wants to create a new chat)
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Chat Page'),
+        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
+        title: const Text('Chat Page'), // name of the page
       ),
-      body: Column(
+
+      body: Column( // show the list of the users that the current user has messages with
         children: [
           Expanded(
-            child: _buildUserList(),
+            child: _buildUserList(), // call the buildUserList method
           ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Color.fromARGB(255, 219, 110, 255),
         onPressed: () {
-          _showNewChatDialog(context);
+          _createNewChatDialog(context);
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -40,51 +43,61 @@ class _ChatPageState extends State<ChatPage> {
   // build list of users that user is currently chatting with
   Widget _buildUserList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(),
+      stream: FirebaseFirestore.instance.collection('users').snapshots(), // value that changes over time so we use stream builder (a dynamic list)
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Text('Error: ${snapshot.error}'); // show any errors
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text('Loading');
+          return const Text('Loading'); // show loading if the data is still being loaded in
         }
 
-        final users = snapshot.data!.docs;
-        return ListView.builder(
+        final users = snapshot.data!.docs; // get the users
+        
+        return ListView.builder( // build a list of all users (like how we see in imessages)
           itemCount: users.length,
           itemBuilder: (context, index) {
-            final userData = users[index].data()! as Map<String, dynamic>;
-            if (_auth.currentUser!.email != userData['email'] && userData['uid'] != null) {
+            final userData = users[index].data()! as Map<String, dynamic>; // get each users data
+            if (_auth.currentUser!.email != userData['email']) { // go through all emails that are not the current user
               return FutureBuilder<bool>(
-                future: _hasChatMessages(userData['uid']),
+                future: _hasChatMessages(userData['uid']),  // wait for this method to bring a result
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Text('Loading');
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}'); // show any errors
                   }
-                  final hasChatMessages = snapshot.data ?? false;
-                  if (hasChatMessages) {
+                  
+                  if (snapshot.connectionState == ConnectionState.waiting) { // get connection state
+                    return const Text('Loading'); // show loading if its loading
+                  }
+
+                  final hasChatMessages = snapshot.data ?? false; // check if there is any data
+                  if (hasChatMessages) { // if there are chat messages show this on our chat page
                     return ListTile(
-                      title: Text(userData['email']),
-                      onTap: () {
+                      title: Text(userData['email']), // the title of the list will be the email
+                      onTap: () { // if they tap on the chat (on pressed used with buttons as done in my chatDetails page)
                         Navigator.push(
-                          context,
+                          context, // push to the chat details page
                           MaterialPageRoute(
                             builder: (context) => ChatDetails(
-                              recieverUserEmail: userData['email'],
+                              recieverUserEmail: userData['email'], // push the email and uid, as wanted in the chatDetails page
                               recieverUserID: userData['uid'],
                             ),
                           ),
                         );
                       },
                     );
-                  } else {
+                  } 
+                  
+                  else { // if there is no chat messages just return empty (we dont want to see it in our list)
                     // empty
-                    return Container();
+                    return Container(); 
                   }
                 },
               );
-            } else {
+            } 
+            
+            else { // if the user is the current user than just return empty (we dont want to message ourselves)
               // empty
               return Container();
             }
@@ -94,91 +107,111 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // check if the current user is chatting w a given user
+  // check if the current user is chatting w a given user (this method is why we use futureBuilder)
   Future<bool> _hasChatMessages(String otherUserId) async {
-    final currentUserUid = _auth.currentUser!.uid;
-    final chatRoomId = [currentUserUid, otherUserId];
-    chatRoomId.sort();
-    final chatRoomIdString = chatRoomId.join('_');
+    final currentUserUid = _auth.currentUser!.uid; // get the current user id
+    final chatRoomId = [currentUserUid, otherUserId]; //get the chat room id
+    chatRoomId.sort(); // sort as it is sorted when the chat is created
+    final chatRoomIdString = chatRoomId.join('_'); // join the sorted room ids to get the actual chat room id
     final querySnapshot = await FirebaseFirestore.instance
         .collection('chat_rooms')
         .doc(chatRoomIdString)
         .collection('messages')
-        .get();
+        .get(); // query all the messages
 
-    return querySnapshot.docs.isNotEmpty;
+    return querySnapshot.docs.isNotEmpty; // determine if its true or false (our Future)
   }
 
   // popup dialog for creating a new chat
-  void _showNewChatDialog(BuildContext context) {
-    TextEditingController emailController = TextEditingController();
-    TextEditingController messageController = TextEditingController();
-    ChatService service = ChatService();
+  void _createNewChatDialog(BuildContext context) {
+    TextEditingController _emailController = TextEditingController(); // give a place for email controller to be used
+    TextEditingController _messageController = TextEditingController(); // give a place for message to be also used
+    ChatService _chatService = ChatService(); // use chat services since we are sending a message
 
-    showDialog(
-      context: context,
+    showDialog( // show Dialog method helps us do a popup on creen
+      context: context, 
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text('Create New Chat'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Recipient Email',
-                    ),
+        return AlertDialog( // use alert dialog to get it one screen w the needed buttons and actions
+          title: Text("Create Chat Message"), // name of the popup
+          content: Column( // use column like I did in the chat details page
+            children: [
+              //text field
+              Expanded(
+                child: TextField( // textfield for user
+                  controller: _emailController, // let user input the email
+                  obscureText: false, // let them see it
+                  decoration: InputDecoration(
+                      labelText: 'User Email', // tell them to input the user email
                   ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: messageController,
-                    decoration: InputDecoration(
-                      labelText: 'Message',
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Cancel'),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    final recipientUserId = await _getUserUidByEmail(emailController.text);
-                    if (recipientUserId != null) {
-                      await service.sendMessage(recipientUserId, messageController.text);
+          
+              ),
+              
+              Expanded(
+                child: TextField(
+                  controller: _messageController, // let user input their message
+                  obscureText: false, // let them see it
+                  decoration: InputDecoration(
+                      labelText: 'Message', // tell them this is where they input the user message
+                  ),
+                ),
+          
+              ),
+  
+            ]
+          ),
+          
+          actions: <Widget>[
+            TextButton( // button where user can exit the widget
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancel"),
+            ),
+        
+            TextButton( // button where user can send their message
+              onPressed: () async { // cause we call an async method
+                if (_messageController.text.isEmpty) // before anything check if user is trying to send empty chat
+                {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please type a message before sending.'), // give them an error message
+                    ),
+                  );
+                }
+                else // if the message controler has content then check validty of email
+                {
+                  final recipientUserId = await _getUserUidByEmail(_emailController.text); // get reciepent id
+                  if (recipientUserId != null) { // if the userId exists
+                    await _chatService.sendMessage(recipientUserId, _messageController.text); // send the message using chatService
                       Navigator.of(context).pop();
                       Navigator.pushNamed(context, '/chat');
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('User does not exist!'),
-                        ),
-                      );
-                    }
-                  },
-                  child: Text('Send'),
-                ),
-              ],
-            );
-          },
-        );
+                  }
+                    
+                  else { // if it doesnt exist
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Email does not exist.'), // show the error message
+                      ),
+                    );
+                  }
+                }
+                
+              },
+              child: Text("Send"), // this is the send button which does all of the stuff above when pressed
+            ),
+          ],
+        );   
       },
     );
   }
 
   // given email get uid
   Future<String?> _getUserUidByEmail(String email) async {
-    final querySnapshot = await FirebaseFirestore.instance
+    final querySnapshot = await FirebaseFirestore.instance // get the query of the userId
         .collection('users')
         .where('email', isEqualTo: email)
         .get();
-    return querySnapshot.docs.isNotEmpty ? querySnapshot.docs.first.id : null;
+    
+    return querySnapshot.docs.isNotEmpty ? querySnapshot.docs.first.id : null; // check if the query exists, if it doesnt return null if it does return the query snapshot of the first id
   }
 }
 

@@ -42,6 +42,7 @@ class ChatService extends ChangeNotifier{
     ids.sort();
     String chatRoomId = ids.join("_");
 
+    // get the message from the given chat room id
     return _fireStore.collection('chat_rooms')
           .doc(chatRoomId)
           .collection('messages')
