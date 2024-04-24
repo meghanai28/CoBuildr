@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       // Navigate to home page
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/dashboard');
 
     } on FirebaseAuthException catch (e) {
       setState(() {

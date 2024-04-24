@@ -118,9 +118,11 @@ class _SignupPageState extends State<SignupPage> {
         'uid': userCredential.user!.uid,
         'email': email,
         'userType': _selectedUserType,
+        'seenProjects': [], 
       });
 
-      
+      // Redirect to home page or any other page after successful registration
+      Navigator.pushReplacementNamed(context, '/dashboard');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         setState(() {

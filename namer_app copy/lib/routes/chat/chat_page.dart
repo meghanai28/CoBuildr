@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:namer_app/routes/chat/chat_details.dart';
 import 'package:namer_app/services/chat_service.dart';
 
@@ -33,6 +33,33 @@ class _ChatPageState extends State<ChatPage> {
           _showNewChatDialog(context);
         },
         child: Icon(Icons.add),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 3,
+        onTap: (index) {
+          // Handle bottom navigation bar taps
+          if (index == 0) {
+            // Navigate to Dashboard page
+            Navigator.pushNamed(context, '/');
+          } else if (index == 1) {
+            // Navigate to Create Project page
+            Navigator.pushNamed(context, '/createProject');
+          } else if (index == 2) {
+            // Navigate to Your Projects page
+            Navigator.pushNamed(context, '/yourProjects');
+          } else if (index == 4) {
+            // Navigate to Settings page
+            Navigator.pushNamed(context, '/settings');
+          }
+        },
+        items: [
+          _buildNavItem(Icons.dashboard, 'Dashboard'),
+          _buildNavItem(Icons.add, 'Create Project'),
+          _buildNavItem(Icons.list, 'Your Projects'),
+          _buildNavItem(Icons.message, 'Messages'),
+          _buildNavItem(Icons.settings, 'Settings'),
+        ],
+        type: BottomNavigationBarType.fixed, // Ensure icons remain visible even when not selected
       ),
     );
   }
@@ -180,5 +207,14 @@ class _ChatPageState extends State<ChatPage> {
         .get();
     return querySnapshot.docs.isNotEmpty ? querySnapshot.docs.first.id : null;
   }
-}
 
+  BottomNavigationBarItem _buildNavItem(IconData icon, String label) {
+    return BottomNavigationBarItem(
+      icon: Icon(
+        icon,
+        color: Colors.purple,
+      ),
+      label: label,
+    );
+  }
+}

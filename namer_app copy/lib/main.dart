@@ -6,7 +6,9 @@ import 'firebase_options.dart';
 import 'routes/welcome_page.dart';
 import 'routes/login_page.dart';
 import 'routes/signup_page.dart';
-import 'routes/home_page.dart';
+import 'routes/dashboard_page.dart';
+import 'routes/createproj_page.dart';
+import 'routes/your_projects.dart';
 import 'routes/chat/chat_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -35,7 +37,9 @@ class MyApp extends StatelessWidget {
         '/welcome': (context) => WelcomePage(), // WelcomePage route
         '/login': (context) => LoginPage(), // LoginPage route
         '/signup': (context) => SignupPage(), // SignupPage route
-        '/home' : (context) => HomePage(), // HomePage route
+        '/dashboard' : (context) => DashboardPage(), // Dashboard route
+        '/createProject': (context) => CreateProjectPage(), //CreateProjectPage route
+        '/yourProjects': (context) => YourProjectsPage(), //YourProjectsPage route
         '/chat' : (context) => ChatPage(), // ChatPage route
         
       },
