@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
       final userData = await _firestore.collection('users').doc(userId).get();
 
       // Navigate to home page
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/dashboard');
 
     } on FirebaseAuthException catch (e) {
       setState(() {
