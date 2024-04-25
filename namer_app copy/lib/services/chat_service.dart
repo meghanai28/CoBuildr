@@ -51,6 +51,21 @@ class ChatService extends ChangeNotifier{
 
   }
 
+  // check if the current user is chatting w a given user (this method is why we use futureBuilder)
+  Future<bool> hasChatMessages(String otherUserId) async {
+    final currentUserUid = _firebaseAuth.currentUser!.uid; // get the current user id
+    final chatRoomId = [currentUserUid, otherUserId]; //get the chat room id
+    chatRoomId.sort(); // sort as it is sorted when the chat is created
+    final chatRoomIdString = chatRoomId.join('_'); // join the sorted room ids to get the actual chat room id
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('chat_rooms')
+        .doc(chatRoomIdString)
+        .collection('messages')
+        .get(); // query all the messages
+
+    return querySnapshot.docs.isNotEmpty; // determine if its true or false (our Future)
+  }
+
 
 
 }

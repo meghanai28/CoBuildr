@@ -12,7 +12,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance; // create instance of authentication (used when user wants to create a new chat)
+  final FirebaseAuth _auth = FirebaseAuth.instance; // create instance of authentication to be used to get current user
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +42,7 @@ class _ChatPageState extends State<ChatPage> {
 
   // build list of users that user is currently chatting with
   Widget _buildUserList() {
+    ChatService _chatService = ChatService();
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(), // value that changes over time so we use stream builder (a dynamic list)
       builder: (context, snapshot) {
@@ -59,9 +60,9 @@ class _ChatPageState extends State<ChatPage> {
           itemCount: users.length,
           itemBuilder: (context, index) {
             final userData = users[index].data()! as Map<String, dynamic>; // get each users data
-            if (_auth.currentUser!.email != userData['email']) { // go through all emails that are not the current user
+            if (_auth.currentUser!.email != userData['email'] && userData['uid'] != null) { // go through all emails that are not the current user
               return FutureBuilder<bool>(
-                future: _hasChatMessages(userData['uid']),  // wait for this method to bring a result
+                future: _chatService.hasChatMessages(userData['uid']),  // wait for this method to bring a result
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}'); // show any errors
@@ -105,21 +106,6 @@ class _ChatPageState extends State<ChatPage> {
         );
       },
     );
-  }
-
-  // check if the current user is chatting w a given user (this method is why we use futureBuilder)
-  Future<bool> _hasChatMessages(String otherUserId) async {
-    final currentUserUid = _auth.currentUser!.uid; // get the current user id
-    final chatRoomId = [currentUserUid, otherUserId]; //get the chat room id
-    chatRoomId.sort(); // sort as it is sorted when the chat is created
-    final chatRoomIdString = chatRoomId.join('_'); // join the sorted room ids to get the actual chat room id
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('chat_rooms')
-        .doc(chatRoomIdString)
-        .collection('messages')
-        .get(); // query all the messages
-
-    return querySnapshot.docs.isNotEmpty; // determine if its true or false (our Future)
   }
 
   // popup dialog for creating a new chat

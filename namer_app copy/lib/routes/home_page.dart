@@ -54,10 +54,11 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Navigate to the chat page
-          Navigator.pushNamed(context, '/chat');
+          Navigator.pushNamed(context, '/editProfile');
         },
         child: Icon(Icons.chat),
       ),
+      
     );
   }
 }

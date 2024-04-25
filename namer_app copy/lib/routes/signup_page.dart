@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:namer_app/models/user.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -113,12 +114,15 @@ class _SignupPageState extends State<SignupPage> {
         print('Message updated: $_message');
       });
 
+      UserProfile newUser = UserProfile (
+        uid: userCredential.user!.uid,
+        email: email,
+        userType: _selectedUserType,
+      );
+
       // Store additional user information in Firestore
-      await _firestore.collection('users').doc(userCredential.user!.uid).set({
-        'uid': userCredential.user!.uid,
-        'email': email,
-        'userType': _selectedUserType,
-      });
+      await _firestore.collection('users').doc(userCredential.user!.uid).set(newUser.toMap());
+
 
       
     } on FirebaseAuthException catch (e) {

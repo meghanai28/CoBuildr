@@ -18,6 +18,9 @@ dependencies:
   firebase_core: 
   firebase_auth: 
   cloud_firestore:
+  image_picker:
+  firebase_storage:
+  file_picker:
 
 
 dev_dependencies:

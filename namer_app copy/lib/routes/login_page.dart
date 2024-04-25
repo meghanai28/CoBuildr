@@ -12,7 +12,6 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance; // instance of firestore
   final TextEditingController _emailController = TextEditingController(); // where they can enter their email
   final TextEditingController _passwordController = TextEditingController(); // enter their password
-  String? _selectedUserType;
   String _message = '';
 
   @override
@@ -44,24 +43,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 10),
 
-
-            DropdownButtonFormField<String>(
-              value: _selectedUserType,
-              hint: Text('Select User Type'),
-              onChanged: (value) {
-                setState(() {
-                  _selectedUserType = value;
-                });
-              },
-              items: ['Student', 'Advisor'].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 20),
-
             ElevatedButton(
               onPressed: () {
                 _login();
@@ -91,8 +72,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     try {
       if (_emailController.text.trim().isEmpty ||
-          _passwordController.text.trim().isEmpty ||
-          _selectedUserType == null) {
+          _passwordController.text.trim().isEmpty) {
         setState(() {
           _message = 'Please fill all fields';
         });
@@ -108,14 +88,6 @@ class _LoginPageState extends State<LoginPage> {
 
       final userId = userCredential.user!.uid;
       final userData = await _firestore.collection('users').doc(userId).get();
-      final userType = userData['userType'];
-
-      if (userType != _selectedUserType) {
-        setState(() {
-          _message = 'Invalid user type';
-        });
-        return;
-      }
 
       // Navigate to home page
       Navigator.pushReplacementNamed(context, '/home');
