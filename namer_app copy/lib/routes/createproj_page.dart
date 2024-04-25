@@ -90,6 +90,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Project'),
+        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
