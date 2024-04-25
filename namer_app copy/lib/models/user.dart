@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserProfile {
@@ -9,6 +11,7 @@ class UserProfile {
   final String? major;
   final String? bio;
   final String profilePictureUrl;
+  final List? seenProjects;
 
   UserProfile({
     required this.email,
@@ -18,7 +21,9 @@ class UserProfile {
     this.school,
     this.major,
     this.bio,
+    this.seenProjects,
     this.profilePictureUrl = 'https://64.media.tumblr.com/0a049264fba0072a818f733a6c533578/tumblr_mqvlz4t5FK1qcnibxo1_540.png', 
+    
   });
 
   Map<String, dynamic> toMap() {
@@ -31,6 +36,7 @@ class UserProfile {
       'major': major,
       'bio': bio,
       'profilePictureUrl': profilePictureUrl,
+      'seenProjects': seenProjects,
     };
   }
 }
