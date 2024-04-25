@@ -41,8 +41,7 @@ class _ChatDetailsState extends State<ChatDetails> {
     return Scaffold(
       
       appBar: AppBar(
-        title: Text(widget.recieverUserEmail),
-        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
+        title: Text(widget.recieverUserEmail),// get rid of back button for now (so buggy)
       ), // title will be name of the recieverUserId
       body: Column(
         children:[

@@ -78,7 +78,7 @@ class _ChatPageState extends State<ChatPage> {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text('Loading'); // show loading if the data is still being loaded in
+          return const Text(''); // show loading if the data is still being loaded in
         }
 
         final users = snapshot.data!.docs; // get the users
@@ -96,7 +96,7 @@ class _ChatPageState extends State<ChatPage> {
                   }
                   
                   if (snapshot.connectionState == ConnectionState.waiting) { // get connection state
-                    return const Text('Loading'); // show loading if its loading
+                    return const Text(''); // show loading if its loading
                   }
 
                   final hasChatMessages = snapshot.data ?? false; // check if there is any data
