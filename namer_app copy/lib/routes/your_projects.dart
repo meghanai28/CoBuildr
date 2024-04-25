@@ -17,6 +17,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Projects'),
+        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -110,7 +111,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
             Navigator.pushNamed(context, '/chat');
           } else if (index == 4) {
             // Navigate to Settings page
-            Navigator.pushNamed(context, '/settings');
+            Navigator.pushNamed(context, '/editProfile');
           }
         },
         items: [

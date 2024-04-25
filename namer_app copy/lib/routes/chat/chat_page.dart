@@ -43,7 +43,7 @@ class _ChatPageState extends State<ChatPage> {
           // Handle bottom navigation bar taps
           if (index == 0) {
             // Navigate to Dashboard page
-            Navigator.pushNamed(context, '/');
+            Navigator.pushNamed(context, '/dashboard');
           } else if (index == 1) {
             // Navigate to Create Project page
             Navigator.pushNamed(context, '/createProject');
@@ -52,7 +52,7 @@ class _ChatPageState extends State<ChatPage> {
             Navigator.pushNamed(context, '/yourProjects');
           } else if (index == 4) {
             // Navigate to Settings page
-            Navigator.pushNamed(context, '/settings');
+            Navigator.pushNamed(context, '/editProfile');
           }
         },
         items: [

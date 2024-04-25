@@ -156,7 +156,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
             Navigator.pushNamed(context, '/chat');
           } else if (index == 4) {
             // Navigate to Settings page
-            Navigator.pushNamed(context, '/settings');
+            Navigator.pushNamed(context, '/editProfile');
           }
         },
         items: [

@@ -70,6 +70,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
+        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
       ),
       body: _projects.isEmpty
           ? Center(
@@ -171,7 +172,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Navigator.pushNamed(context, '/chat');
           } else if (index == 4) {
             // Navigate to Settings page
-            Navigator.pushNamed(context, '/settings');
+            Navigator.pushNamed(context, '/editProfile');
           }
         },
         items: [

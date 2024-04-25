@@ -19,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold( // basic visual layout
       
       appBar: AppBar( // appBar is how we give the basic title property
+        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
         title: Text('Login'),
       ),
       

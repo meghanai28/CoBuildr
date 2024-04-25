@@ -21,6 +21,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
         title: Text('Sign Up'),
       ),
       body: Padding(

@@ -5,6 +5,7 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
         title: Text('Welcome'),
       ),
       body: Center(

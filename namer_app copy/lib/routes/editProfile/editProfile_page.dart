@@ -19,6 +19,7 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
         title: const Text('Edit Profile Page'), // name of the page
       ),
       body: Column(
@@ -28,6 +29,33 @@ class _EditProfileState extends State<EditProfile> {
             child: _createPFP(),
           ),
         ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 4,
+        onTap: (index) {
+          // Handle bottom navigation bar taps
+          if (index == 0) {
+            // Navigate to Dashboard page
+            Navigator.pushNamed(context, '/dashboard');
+          } else if (index == 1) {
+            // Navigate to Create Project page
+            Navigator.pushNamed(context, '/createProject');
+          } else if (index == 2) {
+            // Navigate to Your Projects page
+            Navigator.pushNamed(context, '/yourProjects');
+          } else if (index == 3) {
+            // Navigate to Settings page
+            Navigator.pushNamed(context, '/chat');
+          }
+        },
+        items: [
+          _buildNavItem(Icons.dashboard, 'Dashboard'),
+          _buildNavItem(Icons.add, 'Create Project'),
+          _buildNavItem(Icons.list, 'Your Projects'),
+          _buildNavItem(Icons.message, 'Messages'),
+          _buildNavItem(Icons.settings, 'Settings'),
+        ],
+        type: BottomNavigationBarType.fixed, // Ensure icons remain visible even when not selected
       ),
     );
   }
@@ -55,6 +83,16 @@ class _EditProfileState extends State<EditProfile> {
           );
         } 
       },
+    );
+  }
+
+    BottomNavigationBarItem _buildNavItem(IconData icon, String label) {
+    return BottomNavigationBarItem(
+      icon: Icon(
+        icon,
+        color: Colors.purple,
+      ),
+      label: label,
     );
   }
 }
