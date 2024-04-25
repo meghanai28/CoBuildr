@@ -43,7 +43,7 @@ class _EditProfileState extends State<EditProfile> {
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser?.uid)
           .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+      builder: (context, snapshot) {
         if(snapshot.hasData)
         {
           var userProfile = snapshot.data!.data() as Map<String, dynamic>;
