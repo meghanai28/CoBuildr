@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:namer_app/routes/projectdetails_page.dart';
 
 class YourProjectsPage extends StatefulWidget {
   @override
@@ -46,11 +47,29 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                   itemCount: publishedProjects.length,
                   itemBuilder: (context, index) {
                     final projectData = publishedProjects[index].data() as Map<String, dynamic>;
-                    return ListTile(
-                      title: Text(projectData['title']),
-                      subtitle: Text(projectData['description']),
-                      // Display other project details as needed
-                    );
+                    
+                    return Card(
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          radius: 28, 
+                          backgroundColor: Color.fromARGB(255, 114, 113, 113),
+                          ), 
+                        title: Text(projectData['title']),
+                        //subtitle: Text(projectData['description']),
+                        trailing: const Icon(Icons.arrow_forward), 
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ProjectDetailsPage(projectId: '',), //takes you to proj page 
+                            )); 
+                        }
+                       )
+                    ); 
+
+                    // return ListTile(
+                    //   title: Text(projectData['title']),
+                    //   subtitle: Text(projectData['description']),
+                    //   // Display other project details as needed
+                    // );
                   },
                 );
               },
@@ -81,11 +100,27 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                   itemCount: draftProjects.length,
                   itemBuilder: (context, index) {
                     final projectData = draftProjects[index].data() as Map<String, dynamic>;
-                    return ListTile(
-                      title: Text(projectData['title']),
-                      subtitle: Text(projectData['description']),
-                      // Display other project details as needed
-                    );
+                    return Card(
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          radius: 28, 
+                          backgroundColor: Color.fromARGB(255, 114, 113, 113),
+                          ), 
+                          title: Text(projectData['title']),
+                          //subtitle: Text(projectData['description']),
+                          trailing: const Icon(Icons.arrow_forward), 
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ProjectDetailsPage(projectId: '',), // need to make it so it takes you to the project's page 
+                            )); 
+                        }
+                       )
+                    ); 
+                    // return ListTile(
+                    //   title: Text(projectData['title']),
+                    //   subtitle: Text(projectData['description']),
+                    //   // Display other project details as needed
+                    // );
                   },
                 );
               },

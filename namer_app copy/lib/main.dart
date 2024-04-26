@@ -11,6 +11,7 @@ import 'routes/dashboard_page.dart';
 import 'routes/createproj_page.dart';
 import 'routes/your_projects.dart';
 import 'routes/chat/chat_page.dart';
+import 'routes/projectdetails_page.dart'; 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async{
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/yourProjects': (context) => YourProjectsPage(), //YourProjectsPage route
         '/chat' : (context) => ChatPage(), // ChatPage route
         '/editProfile' :  (context) => EditProfile(), //EditProfilePage
+        '/projectDetails' : (context) => ProjectDetailsPage(userId: '',), // Inidividual project details route 
         
       },
     );
