@@ -22,7 +22,7 @@ class UserProfile {
     this.bio,
     this.skills,
     this.seenProjects,
-    this.profilePictureUrl = 'https://64.media.tumblr.com/0a049264fba0072a818f733a6c533578/tumblr_mqvlz4t5FK1qcnibxo1_540.png', 
+    this.profilePictureUrl = 'https://tse1.mm.bing.net/th?q=blank%20pfp%20icon', 
     
   });
 

@@ -86,62 +86,90 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
-        title: const Text('Edit Profile Page'), // name of the page
+        title: const Text('Edit Profile'), // name of the page
       ),
       body: SingleChildScrollView( // this is what we use to let the user scroll
-        child: Padding( // add padding 
-          padding: const EdgeInsets.all(19.0), // my age lul
-          child: Form( // we r basically creting a form
-            child: Column( // a column of all the stuf we r creating (vertical layout)
-              children: [
-                _createPFP(), //create PFP, i have the method down below
+        child: Form( // we r basically creting a form
+          child: Column( // a column of all the stuf we r creating (vertical layout)
+            children: [
+              Container(
+                color: Color.fromARGB(255, 228, 188, 255), // purple background!
+                width: double.infinity, // width to both sides
+                padding: const EdgeInsets.all(19.0), // add padding
+                child: Stack( // stack w different elements
+                  children: [
+                    Align( // aligned to the right
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        icon: Icon(Icons.logout), // logout button
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/welcome'); // navigate to the login button
+                        },
+                      ),
+                    ),
 
-                const SizedBox(height: 19.0), // my age lul
-                Text('Email: $_email'), // show the email
+                    Center( // aligned to the center
+                      child: Column( // create a vertical column
+                        children: [
+                          _createPFP(), // pfp created
+                          const SizedBox(height: 19.0), // pfp needs 19 space (my age!)
+                          Text('Email: $_email'), // email
+                          const SizedBox(height: 9.0), // 19-10 = 9!
+                          Text('User Type: $_userType'), // user type
+                        ],
+                      )
+                    )
+                  ],
+                ), 
+              ),
+              
+              Padding( // padding so that the header touches both ends but the form doesnt so it doesnt look weird
+                padding:  const EdgeInsets.all(19.0), // add the padding
+                child: Column ( // multiple children in the form so we create another child element
+                  children: [
+                    const SizedBox(height: 25.0), 
+                    TextFormField( // name field in the form
+                      controller: _nameController,
+                      decoration: const InputDecoration(labelText: 'Name'),
+                    ),
+
+                    const SizedBox(height: 9.0),
+                    TextFormField( // school field in the form
+                      controller: _schoolController,
+                      decoration: const InputDecoration(labelText: 'School'),
+                    ),
+
+                    const SizedBox(height: 9.0),
+                    TextFormField( // field for major
+                      controller: _majorController,
+                      decoration: const InputDecoration(labelText: 'Major'),
+                    ),
+
+                    const SizedBox(height: 9.0),
+                    TextFormField( // field for skills
+                      controller: _skillsController,
+                      decoration: const InputDecoration(labelText: 'Skills (comma separated)'),
+                    ),
+
+                    const SizedBox(height: 9.0),
+                    TextFormField( // field for bio
+                      controller: _bioController,
+                      decoration: const InputDecoration(labelText: 'Bio'),
+                      maxLines: null, // let it go for infinity instead of doing the weird sliding thing to the right. (do it vertically)
+                    ),
+
+                    const SizedBox(height: 25.0),
+                    ElevatedButton( // save all the users edits button
+                      onPressed: () async {
+                          _saveEdits(); // call the save edits so changes r saved
+                        },
+                    child: const Text('Save Edits'),
+                    ),
+                  ],
+                ) 
+              ),
                 
-                const SizedBox(height: 9.0), // 19-10
-                Text('User Type: $_userType'), // show the user (student/advisor)
-                
-                const SizedBox(height: 9.0), 
-                TextFormField( // name field in the form
-                  controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Name'),
-                ),
-
-                const SizedBox(height: 9.0),
-                TextFormField( // school field in the form
-                  controller: _schoolController,
-                  decoration: const InputDecoration(labelText: 'School'),
-                ),
-
-                const SizedBox(height: 9.0),
-                TextFormField( // field for major
-                  controller: _majorController,
-                  decoration: const InputDecoration(labelText: 'Major'),
-                ),
-
-                const SizedBox(height: 9.0),
-                TextFormField( // field for skills
-                  controller: _skillsController,
-                  decoration: const InputDecoration(labelText: 'Skills (comma separated)'),
-                ),
-
-                const SizedBox(height: 9.0),
-                TextFormField( // field for bio
-                  controller: _bioController,
-                  decoration: const InputDecoration(labelText: 'Bio'),
-                  maxLines: null, // let it go for infinity instead of doing the weird sliding thing to the right. (do it vertically)
-                ),
-
-                const SizedBox(height: 9.0),
-                ElevatedButton( // save all the users edits button
-                  onPressed: () async {
-                      _saveEdits(); // call the save edits so changes r saved
-                    },
-                child: const Text('Save Edits'),
-                ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
