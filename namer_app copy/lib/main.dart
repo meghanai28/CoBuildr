@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         '/yourProjects': (context) => YourProjectsPage(), //YourProjectsPage route
         '/chat' : (context) => ChatPage(), // ChatPage route
         '/editProfile' :  (context) => EditProfile(), //EditProfilePage
-        '/projectDetails' : (context) => ProjectDetailsPage(userId: '',), // Inidividual project details route 
+        '/projectDetails' : (context) => ProjectDetailsPage(projectId: '',), // Inidividual project details route 
         
       },
     );
