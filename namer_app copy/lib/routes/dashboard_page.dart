@@ -28,7 +28,7 @@ class _DashboardPageState extends State<DashboardPage> {
       final seenProjects = userDoc.get('seenProjects') ?? []; // Get seenProjects array from user document
       final snapshot = await _firestore.collection('published_projects').get();
       setState(() {
-        _projects = snapshot.docs.where((project) => !seenProjects.contains(project.id)).toList();
+        _projects = snapshot.docs.where((project) => project.get('userId') != user.uid && !seenProjects.contains(project.id)).toList();
       });
     }
   }
@@ -58,6 +58,15 @@ class _DashboardPageState extends State<DashboardPage> {
   void _handleLike() {
     final currentProject = _projects[_currentProjectIndex];
     final projectId = currentProject.id;
+
+    final user = _auth.currentUser;
+    if (user != null) {
+      final userRef = _firestore.collection('users').doc(user.uid);
+      userRef.update({
+        'likedProjects': FieldValue.arrayUnion([projectId]),
+      });
+    }
+
     // Implement logic to add user as a teammate to the project
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Liked project with ID: $projectId')),

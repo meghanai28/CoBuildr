@@ -8,8 +8,8 @@ import 'routes/welcome_page.dart';
 import 'routes/login_page.dart';
 import 'routes/signup_page.dart';
 import 'routes/dashboard_page.dart';
-import 'routes/createproj_page.dart';
-import 'routes/your_projects.dart';
+import 'routes/projects/createproj_page.dart';
+import 'routes/projects/your_projects.dart';
 import 'routes/chat/chat_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
