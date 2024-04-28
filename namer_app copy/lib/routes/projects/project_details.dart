@@ -98,7 +98,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                         
   }
 
-  // delete project w cascading deletes (very laggy sad..)
+  // delete project 
   void _deleteProject() async {
     String list = 'draft_projects'; // check which one to delete from
     if(widget.published)
@@ -125,6 +125,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     
   }
 
+  // publish the draft if the user wants too
   void _publishProject() async {
     if (_titleController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
@@ -155,6 +156,8 @@ class _ProjectDetailsState extends State<ProjectDetails> {
       
     
   }
+
+
 
   // build the layout for the chat room (this is the chat details page)
   @override
@@ -191,6 +194,13 @@ class _ProjectDetailsState extends State<ProjectDetails> {
               maxLines: 5,
             ),
 
+            SizedBox(height: 20.0),
+            Text('Teammates'),
+            widget.published ?_buildTeammatesList(): Container(),
+            
+            SizedBox(height: 20.0),
+            Text('Requests'),
+            widget.published ?_buildLikersList(): Container(),
 
             SizedBox(height: 20.0),
             Row(
@@ -253,6 +263,184 @@ class _ProjectDetailsState extends State<ProjectDetails> {
       },
     );
   }
+
+Widget _buildTeammatesList() {
+  final docRef = FirebaseFirestore.instance.collection('published_projects').doc(widget.projectId); // get the project
+  return Container( // return a container
+    height: 90,
+    child: FutureBuilder<DocumentSnapshot>( // just get the data once
+      future: docRef.get(), // get the data
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text(""); // show nothing when loading
+        } 
+        else {
+          final projectData = snapshot.data!.data()! as Map<String, dynamic>; // get the project data
+          final teammates = projectData['teammates'] as List<dynamic>; //get the list
+          
+          return ListView.builder( // create list
+            itemCount: teammates.length, // length of likers
+            itemBuilder: (context, index) {
+              final teammateId = teammates[index]; // get the id
+              return FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance.collection('users').doc(teammateId).get(), // get user data once
+                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return Text(""); // show nothing when loading
+                  } 
+                  else {
+                    final userData = userSnapshot.data!.data()! as Map<String, dynamic>;
+                    final email = userData['email'];
+                    return ListTile(
+                      title: Text(email), // make the title the email
+                      onTap: () async {
+                        _showProfile(context, userData); // do a pop up dialog to show the data of the person requested
+                      },
+                    );
+                  }
+                },
+              );
+            },
+          );
+        }
+      },
+    ),
+  );
+}
+
+
+// build the request list (those who liked the project)
+Widget _buildLikersList() {
+  final docRef = FirebaseFirestore.instance.collection('published_projects').doc(widget.projectId); // get the project
+  return Container( // return a container
+    height: 90,
+    child: FutureBuilder<DocumentSnapshot>( // just get the data once
+      future: docRef.get(), // get the data
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text(""); // show nothing when loading
+        } 
+        else {
+          final projectData = snapshot.data!.data()! as Map<String, dynamic>; // get the project data
+          final likers = projectData['likers'] as List<dynamic>; //get the list
+          
+          return ListView.builder( // create list
+              itemCount: likers.length, // length of likers
+              itemBuilder: (context, index) {
+                final likerId = likers[index]; // get the id
+                return FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance.collection('users').doc(likerId).get(), // get user data once
+                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnapshot) {
+                    if (userSnapshot.connectionState == ConnectionState.waiting) {
+                      return Text(""); // show nothing when loading
+                    } 
+                    else {
+                      final userData = userSnapshot.data!.data()! as Map<String, dynamic>;
+                      final email = userData['email'];
+                      return ListTile(
+                        title: Text(email), // make the title the email
+                        trailing: Row(  // at the end create a row of two buttons to accept and decline the user
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                _acceptRequest(likerId, projectData); // accept button
+                              },
+                              child: Text('Accept'),
+                            ),
+                            SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () {
+                                _declineRequest(likerId, projectData); // decline button
+                              },
+                              child: Text('Decline'),
+                            ),
+                          ],
+                        ),
+                        onTap: () async {
+                          _showProfile(context, userData); // do a pop up dialog to show the data of the person requested
+                        },
+                      );
+                    }
+                  },
+                );
+              },
+            );
+        }
+      },
+    ),
+  );
+}
+
+void _acceptRequest(String userId, Map<String, dynamic> projectData) async {
+  
+  projectData['teammates'].add(userId); // add to the teamates -> the userid
+
+  projectData['likers'].remove(userId); // remove from the likers list
+
+  await FirebaseFirestore.instance
+      .collection('published_projects')
+      .doc(widget.projectId)
+      .set(projectData);   // all data should be updated in the firebase
+  
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Request accepted')), // confirm
+  );
+
+  setState(() {}); // refresh the container after ever change
+
+}
+
+void _declineRequest(String userId, Map<String, dynamic> projectData) async {
+
+  projectData['likers'].remove(userId); // remove from the likers list
+
+  await FirebaseFirestore.instance
+      .collection('published_projects')
+      .doc(widget.projectId)
+      .set(projectData); // all data should be updated in the firebase
+
+ 
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Request declined')), // confirm
+  );
+
+  setState(() {}); // refresh the container after ever change
+
+}
+
+
+void _showProfile(BuildContext context, Map<String, dynamic> val) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('${val['email']}'), // show the email as title
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, 
+          children: [
+            Text('Name: ${val['name']}'), // show the name
+            Text('User Type: ${val['userType']}'), // show the user type
+            Text('Major: ${val['major']}'), // show the major
+            Text('Skills: ${val['skills']}'), // show the skills
+            Text('Biography: ${val['bio']}'), // show the bio
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context), // when they exit just exit the popup dialog
+            child: Text("Close"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
+
 
   
 }

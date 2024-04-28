@@ -149,7 +149,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                   context, // push to the chat details page
                   MaterialPageRoute(
                     builder: (context) => ProjectDetails(
-                      projectId: projectData['projectId'], 
+                      projectId: projectId, 
                       owner: true, 
                       published: published
                     )

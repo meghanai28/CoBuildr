@@ -47,6 +47,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
         'tags': _filtersController.text.split(',').map((tag) => tag.trim()).toList(),
         'userId': user.uid,
         'teammates' : [],
+        'likers' : [],
       };
 
       if (!isDraft) {

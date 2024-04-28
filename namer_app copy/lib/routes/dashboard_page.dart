@@ -65,6 +65,11 @@ class _DashboardPageState extends State<DashboardPage> {
       userRef.update({
         'likedProjects': FieldValue.arrayUnion([projectId]),
       });
+
+      final projectRef = _firestore.collection('published_projects').doc(projectId);
+      projectRef.update({
+        'likers': FieldValue.arrayUnion([user.uid]),
+      });
     }
 
     // Implement logic to add user as a teammate to the project
