@@ -37,6 +37,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
 
   // get/set the data of the project
   void _getAndSetProject() async {
+    print(widget.owner);
     String list = 'draft_projects';
     if(widget.published)
     {
@@ -175,35 +176,36 @@ class _ProjectDetailsState extends State<ProjectDetails> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
 
-            TextFormField(
+            widget.owner ? TextFormField(
               controller: _titleController, // title text field
               decoration: InputDecoration(labelText: 'Project Title'),
-            ),
+            ) : Text('Project Title: ${_titleController.text}'),
 
             SizedBox(height: 20.0),
-            Text('Tags (comma-separated)'),
-            TextFormField(
+            !widget.owner ? Text('Filters') : Container(),
+            
+            widget.owner ? TextFormField(
               controller: _filtersController, // filters text field
               decoration: InputDecoration(labelText: 'Project Filters'),
-            ),
+            ): Row( children: _buildTags(), ),
             
             SizedBox(height: 20.0),
-            TextFormField(
+            widget.owner ? TextFormField(
               controller: _descriptionController, // description text field
               decoration: InputDecoration(labelText: 'Description'),
               maxLines: 5,
-            ),
+            ) : Text('Description: ${_descriptionController.text}'),
 
             SizedBox(height: 20.0),
             Text('Teammates'),
             widget.published ?_buildTeammatesList(): Container(),
             
-            SizedBox(height: 20.0),
-            Text('Requests'),
-            widget.published ?_buildLikersList(): Container(),
+            widget.published && widget.owner ? SizedBox(height: 20.0) : Container(),
+            widget.published && widget.owner ? Text('Requests') : Container(),
+            widget.published && widget.owner ?_buildLikersList(): Container(),
 
-            SizedBox(height: 20.0),
-            Row(
+            widget.owner ? SizedBox(height: 20.0) : Container(),
+            widget.owner ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton( // save edits button
@@ -222,7 +224,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                 ),
 
               ],
-            ),
+            ): Container(),
           ],
         ),
       ),
@@ -243,7 +245,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
           content: Column( // use column like I did in the chat details page
             children: [
               //text field
-                Text('Warning! Once you delete, neither you, your teamates nor your advisour will be able to see this page.'),
+                Text('Warning! Once you delete, neither you, your teamates, nor your advisor will be able to see this page.'),
                 Text('All data will be lost for this project when deleted.'),
             ]
           ),
@@ -438,6 +440,20 @@ void _showProfile(BuildContext context, Map<String, dynamic> val) {
   );
 }
 
+List<Widget> _buildTags() {
+    final tags = _filtersController.text.split(',').map((tag) => tag.trim()).toList();
+    return tags.map((tag) {
+      return Container(
+        margin: EdgeInsets.only(right: 10.0),
+        padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Text(tag.toString()),
+      );
+    }).toList();
+  }
 
 
 
