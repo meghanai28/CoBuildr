@@ -112,7 +112,7 @@ class _EditProfileState extends State<EditProfile> {
                       child: Column( // create a vertical column
                         children: [
                           _createPFP(), // pfp created
-                          const SizedBox(height: 19.0), // pfp needs 19 space (my age!)
+                          const SizedBox(height: 10), // pfp needs 19 space (my age!)
                           Text('Email: $_email'), // email
                           const SizedBox(height: 9.0), // 19-10 = 9!
                           Text('User Type: $_userType'), // user type
@@ -127,7 +127,7 @@ class _EditProfileState extends State<EditProfile> {
                 padding:  const EdgeInsets.all(19.0), // add the padding
                 child: Column ( // multiple children in the form so we create another child element
                   children: [
-                    const SizedBox(height: 25.0), 
+                    const SizedBox(height: 15.0), 
                     TextFormField( // name field in the form
                       controller: _nameController,
                       decoration: const InputDecoration(labelText: 'Name'),
@@ -155,7 +155,7 @@ class _EditProfileState extends State<EditProfile> {
                     TextFormField( // field for bio
                       controller: _bioController,
                       decoration: const InputDecoration(labelText: 'Bio'),
-                      maxLines: null, // let it go for infinity instead of doing the weird sliding thing to the right. (do it vertically)
+                      maxLines: 5, // let it go for 5 lines instead of doing the weird sliding thing to the right. (do it vertically)
                     ),
 
                     const SizedBox(height: 25.0),
@@ -208,7 +208,7 @@ class _EditProfileState extends State<EditProfile> {
   // create the pfp (i orginally did another query here which is why I created a helper method!)
   Widget _createPFP() {
     return CircleAvatar(
-      radius: 90,
+      radius: 50,
       backgroundImage: NetworkImage(_pfp),
     ); 
   }

@@ -46,8 +46,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
         'description': _descriptionController.text,
         'tags': _filtersController.text.split(',').map((tag) => tag.trim()).toList(),
         'userId': user.uid,
-        'projectId': _generateProjectId(), // Add project ID
-        // Add other fields as needed (e.g., profile pic)
+        'teammates' : [],
+        'likers' : [],
       };
 
       if (!isDraft) {
@@ -61,8 +61,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Project ${isDraft ? 'saved' : 'published'} successfully')),
       );
-      // Navigate back to previous page
-      Navigator.pop(context);
+      
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error ${isDraft ? 'saving' : 'publishing'} project')),
@@ -70,10 +69,6 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     }
   }
 
-  String _generateProjectId() {
-    // Generate a random project ID
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
 
   @override
   Widget build(BuildContext context) {

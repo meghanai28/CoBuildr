@@ -11,6 +11,7 @@ class UserProfile {
   final String? skills;
   final String profilePictureUrl;
   final List? seenProjects;
+  final List? likedProjects;
 
   UserProfile({
     required this.email,
@@ -22,6 +23,7 @@ class UserProfile {
     this.bio,
     this.skills,
     this.seenProjects,
+    this.likedProjects,
     this.profilePictureUrl = 'https://tse1.mm.bing.net/th?q=blank%20pfp%20icon', 
     
   });
@@ -38,6 +40,7 @@ class UserProfile {
       'profilePictureUrl': profilePictureUrl,
       'seenProjects': seenProjects,
       'skills': skills,
+      'likedProjects': likedProjects,
     };
   }
 }
