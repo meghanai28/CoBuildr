@@ -150,7 +150,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                   MaterialPageRoute(
                     builder: (context) => ProjectDetails(
                       projectId: projectId, 
-                      owner: true, 
+                      owner: false, 
                       published: published
                     )
                   ),
