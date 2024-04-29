@@ -89,9 +89,14 @@ class _LoginPageState extends State<LoginPage> {
 
       final userId = userCredential.user!.uid;
       final userData = await _firestore.collection('users').doc(userId).get();
+      final userType = userData.data()?['userType'];
+      
 
-      // Navigate to home page
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      if (userType == 'Student') {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else if (userType == 'Advisor') {
+        Navigator.pushReplacementNamed(context, '/advisor/advisor_dashboard'); // Corrected route
+      }
 
     } on FirebaseAuthException catch (e) {
       setState(() {

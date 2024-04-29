@@ -127,8 +127,9 @@ class _SignupPageState extends State<SignupPage> {
 
 
 
-      // Redirect to home page or any other page after successful registration
-      Navigator.pushReplacementNamed(context, '/dashboard');
+       // Redirect to log-in page after sign-up
+    Navigator.pushReplacementNamed(context, '/login');
+
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         setState(() {

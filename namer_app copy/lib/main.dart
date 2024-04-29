@@ -12,6 +12,13 @@ import 'routes/projects/createproj_page.dart';
 import 'routes/projects/your_projects.dart';
 import 'routes/chat/chat_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'routes/advisor/advisor_dashboard.dart';
+import 'routes/advisor/project_tab.dart';
+import 'routes/advisor/feedback.dart';
+import 'routes/advisor/advisor_chat.dart';
+import 'routes/advisor/advisor_setting.dart';
+
+
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +50,16 @@ class MyApp extends StatelessWidget {
         '/yourProjects': (context) => YourProjectsPage(), //YourProjectsPage route
         '/chat' : (context) => ChatPage(), // ChatPage route
         '/editProfile' :  (context) => EditProfile(), //EditProfilePage
-        
+        '/advisor/advisor_dashboard' : (context) => AdvisorDashboardPage(),
+        '/advisor/project_tab' : (context) => AdvisorProjectsPage(),
+        '/advisor/feedback' : (content) => FeedbackPage(),
+        '/advisor/advisor_chat' : (content) => AdvisorChatPage(),
+        '/advisor/advisor_setting' : (content) => AdvisorEditProfile(),
+       
+       
+
+
+
       },
     );
   }
