@@ -79,7 +79,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
 
   void reloadContainer() {
     setState(() {
-      
+
     });
   }
 
