@@ -27,9 +27,10 @@ class _AdvisorDashboardPageState extends State<AdvisorDashboardPage> {
     if (user != null) {
       final userDoc = await _firestore.collection('users').doc(user.uid).get();
       final seenProjects = userDoc.get('seenProjects') ?? []; // Get seenProjects array from user document
+      final advisorRequests = userDoc.get('advisorRequests') ?? []; // Get advisorRequests array from user document
       final snapshot = await _firestore.collection('published_projects').get();
       setState(() {
-        _projects = snapshot.docs.where((project) => project.get('userId') != user.uid && !seenProjects.contains(project.id)).toList();
+        _projects = snapshot.docs.where((project) => project.get('userId') != user.uid && !seenProjects.contains(project.id) && advisorRequests.contains(project.id)).toList();
       });
     }
   }
@@ -46,6 +47,15 @@ class _AdvisorDashboardPageState extends State<AdvisorDashboardPage> {
         'seenProjects': FieldValue.arrayUnion([projectId]),
       });
     }
+
+    final projectRef = _firestore.collection('published_projects').doc(projectId);
+      if (user != null) {
+        final projectRef = _firestore.collection('published_projects').doc(projectId);
+          projectRef.update({
+            'advisors': FieldValue.arrayRemove([user.uid]),
+          });
+      }
+
 
     setState(() {
       if (_currentProjectIndex < _projects.length - 1) {
@@ -69,7 +79,7 @@ class _AdvisorDashboardPageState extends State<AdvisorDashboardPage> {
 
       final projectRef = _firestore.collection('published_projects').doc(projectId);
       projectRef.update({
-        'likers': FieldValue.arrayUnion([user.uid]),
+        'advisorActive': true,
       });
     }
 
@@ -77,7 +87,21 @@ class _AdvisorDashboardPageState extends State<AdvisorDashboardPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Liked project with ID: $projectId')),
     );
-    _handleDislike(); // Move to the next project
+
+    if (user != null) {
+      final userRef = _firestore.collection('users').doc(user.uid);
+      userRef.update({
+        'seenProjects': FieldValue.arrayUnion([projectId]),
+      });
+    }
+
+    setState(() {
+      if (_currentProjectIndex < _projects.length - 1) {
+        _currentProjectIndex++;
+      } else {
+        _projects = []; // Clear projects list
+      }
+    }); // Move to the next project
   }
 
   @override

@@ -136,19 +136,19 @@ class _AdvisorEditProfileState extends State<AdvisorEditProfile> {
                     const SizedBox(height: 9.0),
                     TextFormField( // school field in the form
                       controller: _schoolController,
-                      decoration: const InputDecoration(labelText: 'School'),
+                      decoration: const InputDecoration(labelText: 'University'),
                     ),
 
                     const SizedBox(height: 9.0),
                     TextFormField( // field for major
                       controller: _majorController,
-                      decoration: const InputDecoration(labelText: 'Major'),
+                      decoration: const InputDecoration(labelText: 'Field of Study'),
                     ),
 
                     const SizedBox(height: 9.0),
                     TextFormField( // field for skills
                       controller: _skillsController,
-                      decoration: const InputDecoration(labelText: 'Field, Years of Experience (comma separated)'),
+                      decoration: const InputDecoration(labelText: 'Roles/Jobs (comma separated)'),
                     ),
 
                     const SizedBox(height: 9.0),

@@ -48,6 +48,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
         'userId': user.uid,
         'teammates' : [],
         'likers' : [],
+        'advisors' : [],
+        'advisorActive' : false,
       };
 
       if (!isDraft) {

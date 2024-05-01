@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:namer_app/routes/projects/request_advisor.dart';
 import 'package:namer_app/services/chat_service.dart';
 
 class ProjectDetails extends StatefulWidget {
@@ -60,6 +61,100 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     
   }
 
+  Future<DocumentSnapshot> _getProjectData() async {
+    String list = 'draft_projects'; // get the correct list to save to
+    if (widget.published) {
+      list = 'published_projects';
+    }
+
+    return FirebaseFirestore.instance // get the data
+      .collection(list)
+      .doc(widget.projectId)
+      .get();
+  }
+
+  Future<DocumentSnapshot> _getUserData(String id) async {
+    return FirebaseFirestore.instance.collection('users').doc(id).get(); // get user data
+  }
+
+  void reloadContainer() {
+    setState(() {
+      // Implement your logic to reload the container
+    });
+  }
+
+  // advisor get
+  Widget _getAdvisor() {
+    return FutureBuilder<DocumentSnapshot>(
+      future: _getProjectData(), // get the project data
+      builder: (context, projectSnapshot) {
+        if (projectSnapshot.connectionState == ConnectionState.waiting) {
+        return Text(""); 
+        } 
+
+        else if (projectSnapshot.hasError) {
+          return Text('Error: ${projectSnapshot.error}');
+        }
+
+        var projectProfile = projectSnapshot.data!.data() as Map<String, dynamic>;
+        final advisors = projectProfile['advisors'];
+        final active = projectProfile['advisorActive'];
+        if (advisors.length == 0) {
+          if(widget.owner)
+          {
+            return ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RequestAdvisorPage(projectId: widget.projectId, reloadRequestedContainer: reloadContainer),
+                    
+                  ),
+              ) ;
+              },
+              child: Text('Request Advisor'),
+            );
+          }
+          else{
+            Text('No current advisor');
+          }
+        } 
+        else {
+          return FutureBuilder<DocumentSnapshot>(
+              future: _getUserData(advisors[0]), // get user data for advisor requested
+              builder: (context, userSnapshot) {
+              if (userSnapshot.connectionState == ConnectionState.waiting) {
+                return Text(""); 
+              } 
+              else if (userSnapshot.hasError) {
+                return Text('Error: ${userSnapshot.error}');
+              } 
+              else {
+                var userProfile = userSnapshot.data!.data() as Map<String, dynamic>;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                      Text(active ? "Current Advisor" : "Request Advisor (waiting for response)"),
+                      ListTile(
+                        title: Text(userProfile['email']), // tite
+                        onTap: () async {
+                          _showProfile(context, userProfile); // call show profile here
+                        },
+                      ),
+                    ],
+                  );
+                }
+              }
+    
+          );
+        }
+        return Text('');
+      },
+      
+    );
+    
+  }
+
   // save changes to data
   void _saveEdits() async {
     
@@ -96,6 +191,8 @@ class _ProjectDetailsState extends State<ProjectDetails> {
       content: Text('Project updated successfully'),
       duration: Duration(seconds: 2),
     ));
+
+    setState(() {});
                         
   }
 
@@ -197,12 +294,15 @@ class _ProjectDetailsState extends State<ProjectDetails> {
             ) : Text('Description: ${_descriptionController.text}'),
 
             SizedBox(height: 20.0),
-            Text('Teammates'),
+            widget.published ? Text('Teammates'): Container(),
             widget.published ?_buildTeammatesList(): Container(),
             
             widget.published && widget.owner ? SizedBox(height: 20.0) : Container(),
             widget.published && widget.owner ? Text('Requests') : Container(),
             widget.published && widget.owner ?_buildLikersList(): Container(),
+
+            widget.published ? _getAdvisor(): Container(),
+            widget.published ? SizedBox(height: 20.0) : Container(),
 
             widget.owner ? SizedBox(height: 20.0) : Container(),
             widget.owner ? Row(
@@ -424,6 +524,7 @@ void _showProfile(BuildContext context, Map<String, dynamic> val) {
           children: [
             Text('Name: ${val['name']}'), // show the name
             Text('User Type: ${val['userType']}'), // show the user type
+            Text('University: ${val['school']}'),
             Text('Major: ${val['major']}'), // show the major
             Text('Skills: ${val['skills']}'), // show the skills
             Text('Biography: ${val['bio']}'), // show the bio

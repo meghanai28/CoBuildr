@@ -30,19 +30,9 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
             ),
           ),
           Expanded(
-            child: _buildCurrentlyAdvisingProjects(),
+            child: _buildProjectList(),
           ),
-          Divider(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Previously Advised',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            child: _buildPreviouslyAdvisedProjects(),
-          ),
+          
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -84,26 +74,53 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
     );
   }
 
-  Widget _buildCurrentlyAdvisingProjects() {
-    return ListView(
-      children: [
-        _buildProjectTile('Project 1', 'Project 1 Description'),
-        _buildProjectTile('Project 2', 'Project 2 Description'),
-      ],
+ Widget _buildProjectList(){
+    
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+                  .collection('published_projects')
+                  .snapshots(), // dynamic list values change over time
+      builder: (context, snapshot){
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}'); // show any errors
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Text(''); // show loading if the data is still being loaded in
+        }
+
+        final projects = snapshot.data!.docs; //get published projects
+        return ListView.builder( // build a list of all projects (like how we see in imessages)
+          itemCount: projects.length,
+          itemBuilder: (context, index) {
+            final projectData = projects[index].data()! as Map<String, dynamic>; // get each project data
+            final advisors = projectData['advisors'];
+            final projectId = projects[index].id;
+            
+            if(advisors != null && advisors.contains(_auth.currentUser!.uid))
+            {
+              return ListTile(
+               title: _buildProjectTile(projectData['title'], 'Currently Advising',projectId), // the title of the list will be the project name
+               
+              );
+            }
+            else 
+            {
+                return Container(); 
+            }
+            
+          }
+        );
+
+      }
+        
     );
   }
 
-  Widget _buildPreviouslyAdvisedProjects() {
-    return ListView(
-      children: [
-        _buildProjectTile('Project 3', 'Project 3 Description'),
-        _buildProjectTile('Project 4', 'Project 4 Description'),
-        _buildProjectTile('Project 5', 'Project 5 Description'),
-      ],
-    );
-  }
 
-  Widget _buildProjectTile(String projectName, String projectDescription) {
+  
+
+  Widget _buildProjectTile(String projectName, String projectDescription, String projectId) {
     return ListTile(
       leading: _buildSquare(), // Add light purple square
       title: Text(
@@ -112,8 +129,16 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
       ),
       subtitle: Text(projectDescription), // Add project description
       onTap: () {
-        // Handle onTap by navigating to project details page
-        Navigator.pushNamed(context, '/project_details');
+        Navigator.push(
+                  context, // push to the chat details page
+                  MaterialPageRoute(
+                    builder: (context) => ProjectDetails(
+                      projectId: projectId, 
+                      owner: false, 
+                      published: true
+                    )
+                  ),
+                );
       },
     );
   }

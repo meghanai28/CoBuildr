@@ -136,7 +136,7 @@ class _EditProfileState extends State<EditProfile> {
                     const SizedBox(height: 9.0),
                     TextFormField( // school field in the form
                       controller: _schoolController,
-                      decoration: const InputDecoration(labelText: 'School'),
+                      decoration: const InputDecoration(labelText: 'University'),
                     ),
 
                     const SizedBox(height: 9.0),
