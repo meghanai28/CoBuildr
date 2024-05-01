@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
               },
               child: Text(
                 "Don't have an account? Create one",
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(color: const Color.fromARGB(255, 114, 33, 243)),
               ),
             ),
           ],
@@ -92,15 +92,24 @@ class _LoginPageState extends State<LoginPage> {
       final userType = userData.data()?['userType'];
       
 
-      if (userType == 'Student') {
-        Navigator.pushReplacementNamed(context, '/dashboard');
-      } else if (userType == 'Advisor') {
-        Navigator.pushReplacementNamed(context, '/advisor/advisor_dashboard'); // Corrected route
-      }
+      //if (userCredential.user!.emailVerified) {
+        if (userType == 'Student') {
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        } 
+        else if (userType == 'Advisor') {
+          Navigator.pushReplacementNamed(context, '/advisor/advisor_dashboard'); // Corrected route
+        }
+      //} else {
+      
+        //setState(() {
+          //_message = 'Please verify your email to proceed';
+       // });
+    // }
+
 
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _message = 'Error: ${e.message}';
+        _message = 'Password or Email incorrect';
       });
     } catch (e) {
       setState(() {
