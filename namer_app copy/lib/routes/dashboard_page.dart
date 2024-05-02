@@ -84,93 +84,139 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
-        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
+        automaticallyImplyLeading: false,
       ),
       body: _projects.isEmpty
           ? Center(
               child: Text('No projects available'),
             )
           : Center(
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  elevation: 5,
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.8, // Adjust the height as needed
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              _projects[_currentProjectIndex]['title'],
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+              child: Stack(
+                children: [
+                  Container(
+                    margin: EdgeInsets.fromLTRB(40.0, 20.0, 40.0, 45.0),
+                    child: Dismissible(
+                      key: Key(_projects[_currentProjectIndex].id),
+                      onDismissed: (direction) {
+                        if (direction == DismissDirection.endToStart) {
+                          _handleDislike(); // Changed to handle dislike on left swipe
+                        } else if (direction == DismissDirection.startToEnd) {
+                          _handleLike(); // Changed to handle like on right swipe
+                        }
+                      },
+                      background: Container(
+                        color: Colors.green, // Changed color to green for like
+                        alignment: Alignment.centerLeft,
+                        child: Icon(Icons.check, color: Colors.white, size: 40.0),
+                      ),
+                      secondaryBackground: Container(
+                        color: Colors.red, // Changed color to red for dislike
+                        alignment: Alignment.centerRight,
+                        child: Icon(Icons.close, color: Colors.white, size: 40.0),
+                      ),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0)
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Row(
-                            children: _buildTags(),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.all(10.0),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(15.0),
-                                bottomRight: Radius.circular(15.0),
-                              ),
-                            ),
+                        elevation: 5,
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.8,
+                          child: SingleChildScrollView(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text(
-                                  'Project Description:',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16.0,
+                                Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      _projects[_currentProjectIndex]['title'],
+                                      style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                SizedBox(height: 5.0),
-                                Text(
-                                  _projects[_currentProjectIndex]['description'],
-                                  style: TextStyle(fontSize: 16.0),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                                  child: Wrap(
+                                    children: _buildTags(),
+                                  ),
                                 ),
+                                Container(
+                                  padding: EdgeInsets.all(10.0),
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(15.0),
+                                      bottomRight: Radius.circular(15.0),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Project Description:',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5.0),
+                                      Text(
+                                        _projects[_currentProjectIndex]['description'],
+                                        style: TextStyle(fontSize: 16.0),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 20.0),
                               ],
                             ),
                           ),
                         ),
-                        SizedBox(height: 20.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            ElevatedButton(
-                              onPressed: _handleDislike,
-                              child: Text('Dislike'),
-                            ),
-                            ElevatedButton(
-                              onPressed: _handleLike,
-                              child: Text('Like'),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                  Positioned(
+                    bottom: 20.0,
+                    left: 20.0,
+                    child: Container(
+                      width: 60.0,
+                      height: 60.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.red,
+                      ),
+                      child: IconButton(
+                        iconSize: 30.0,
+                        icon: Icon(Icons.close, color: Colors.white),
+                        onPressed: _handleDislike,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 20.0,
+                    right: 20.0,
+                    child: Container(
+                      width: 60.0,
+                      height: 60.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.green,
+                      ),
+                      child: IconButton(
+                        iconSize: 30.0,
+                        icon: Icon(Icons.check, color: Colors.white),
+                        onPressed: _handleLike,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (index) {
