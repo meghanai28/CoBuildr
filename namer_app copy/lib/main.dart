@@ -17,6 +17,9 @@ import 'routes/advisor/project_tab.dart';
 import 'routes/advisor/feedback.dart';
 import 'routes/advisor/advisor_chat.dart';
 import 'routes/advisor/advisor_setting.dart';
+import 'routes/advisor/project.dart';
+
+
 
 
 
@@ -55,6 +58,9 @@ class MyApp extends StatelessWidget {
         '/advisor/feedback' : (content) => FeedbackPage(),
         '/advisor/advisor_chat' : (content) => AdvisorChatPage(),
         '/advisor/advisor_setting' : (content) => AdvisorEditProfile(),
+        '/advisor/project' : (content) => IndividualProjectPage(),
+        
+
        
        
 
