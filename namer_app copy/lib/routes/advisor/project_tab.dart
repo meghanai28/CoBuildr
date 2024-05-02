@@ -113,7 +113,7 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
       subtitle: Text(projectDescription), // Add project description
       onTap: () {
         // Handle onTap by navigating to project details page
-        Navigator.pushNamed(context, '/project_details');
+        Navigator.pushNamed(context, '/advisor/project');
       },
     );
   }
