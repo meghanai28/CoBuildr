@@ -6,14 +6,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class EditProfile extends StatefulWidget {
-  const EditProfile({Key? key}) : super(key: key);
+class AdvisorEditProfile extends StatefulWidget {
+  const AdvisorEditProfile({Key? key}) : super(key: key);
 
   @override
-  State<EditProfile> createState() => _EditProfileState(); // create the state
+  State<AdvisorEditProfile> createState() =>  _AdvisorEditProfileState(); // create the state
 }
 
-class _EditProfileState extends State<EditProfile> {
+class _AdvisorEditProfileState extends State<AdvisorEditProfile> {
   
   final _nameController = TextEditingController(); // where name is inputted
   final _schoolController = TextEditingController(); // where school is inputed
@@ -142,13 +142,13 @@ class _EditProfileState extends State<EditProfile> {
                     const SizedBox(height: 9.0),
                     TextFormField( // field for major
                       controller: _majorController,
-                      decoration: const InputDecoration(labelText: 'Major'),
+                      decoration: const InputDecoration(labelText: 'Field of Study'),
                     ),
 
                     const SizedBox(height: 9.0),
                     TextFormField( // field for skills
                       controller: _skillsController,
-                      decoration: const InputDecoration(labelText: 'Skills (comma separated)'),
+                      decoration: const InputDecoration(labelText: 'Roles/Jobs (comma separated)'),
                     ),
 
                     const SizedBox(height: 9.0),
@@ -175,26 +175,22 @@ class _EditProfileState extends State<EditProfile> {
       ),
       
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 4,
+        currentIndex: 3,
         onTap: (index) {
           // Handle bottom navigation bar taps
           if (index == 0) {
             // Navigate to Dashboard page
-            Navigator.pushNamed(context, '/dashboard');
+            Navigator.pushNamed(context, '/advisor/advisor_dashboard');
           } else if (index == 1) {
-            // Navigate to Create Project page
-            Navigator.pushNamed(context, '/createProject');
-          } else if (index == 2) {
             // Navigate to Your Projects page
-            Navigator.pushNamed(context, '/yourProjects');
-          } else if (index == 3) {
-            // Navigate to Settings page
-            Navigator.pushNamed(context, '/chat');
+            Navigator.pushNamed(context, '/advisor/project_tab');
+          } else if (index == 2) {
+            // Navigate to chat page
+            Navigator.pushNamed(context, '/advisor/advisor_chat');
           }
         },
         items: [
           _buildNavItem(Icons.dashboard, 'Dashboard'),
-          _buildNavItem(Icons.add, 'Create Project'),
           _buildNavItem(Icons.list, 'Your Projects'),
           _buildNavItem(Icons.message, 'Messages'),
           _buildNavItem(Icons.settings, 'Settings'),

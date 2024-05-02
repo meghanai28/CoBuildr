@@ -9,12 +9,12 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  String? _selectedUserType;
+  final FirebaseAuth _auth = FirebaseAuth.instance; // instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // instance
+  final TextEditingController _emailController = TextEditingController(); // email placed here
+  final TextEditingController _passwordController = TextEditingController(); // text placed here
+  final TextEditingController _confirmPasswordController = TextEditingController(); // password placed here
+  String? _selectedUserType; // what user selects
   String _message = '';
 
   @override
@@ -25,27 +25,31 @@ class _SignupPageState extends State<SignupPage> {
         title: Text('Sign Up'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0), // add padding
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email (edu)'),
+              decoration: InputDecoration(labelText: 'Email (edu)'), // edu emails
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 10), // spacing
+
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(labelText: 'Password'), // password
               obscureText: true,
             ),
             SizedBox(height: 10),
+
             TextField(
               controller: _confirmPasswordController,
-              decoration: InputDecoration(labelText: 'Confirm Password'),
+              decoration: InputDecoration(labelText: 'Confirm Password'), // double check
               obscureText: true,
             ),
             SizedBox(height: 10),
+
             DropdownButtonFormField<String>(
               value: _selectedUserType,
               hint: Text('Select User Type'),
@@ -58,26 +62,29 @@ class _SignupPageState extends State<SignupPage> {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
-                );
+                ); // drop down for user to select if they are student or advisor
               }).toList(),
             ),
+
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 _signUp();
               },
-              child: Text('Create Account'),
+              child: Text('Create Account'), // sign up
             ),
+
             SizedBox(height: 10),
             Text(_message),
             SizedBox(height: 20),
+
             GestureDetector(
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/login');
               },
               child: Text(
                 'Already have an account? Login',
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(color: const Color.fromARGB(255, 114, 33, 243)),
               ),
             ),
           ],
@@ -96,23 +103,25 @@ class _SignupPageState extends State<SignupPage> {
           _message = 'Please fill all fields';
         });
         return;
-      }
+      } // if user doesnt fill everything
 
       if (_passwordController.text != _confirmPasswordController.text) {
         setState(() {
           _message = 'Passwords do not match';
         });
         return;
-      }
+      } // mistype
 
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
-      final UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email, password: password
+      ); //create user credential
+
+      await userCredential.user!.sendEmailVerification();
 
       setState(() {
-        _message = 'Account created successfully';
-        print('Message updated: $_message');
+        _message = 'Account created successfully. Verification email sent.';
       });
 
       UserProfile newUser = UserProfile (
@@ -122,17 +131,16 @@ class _SignupPageState extends State<SignupPage> {
         seenProjects : [],
       );
 
-      // Store additional user information in Firestore
+      // save this information into the user database
       await _firestore.collection('users').doc(userCredential.user!.uid).set(newUser.toMap());
 
+      // redirect to log-in page after sign-up
+      Navigator.pushReplacementNamed(context, '/login');
 
-
-      // Redirect to home page or any other page after successful registration
-      Navigator.pushReplacementNamed(context, '/dashboard');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         setState(() {
-          _message = 'The password provided is too weak';
+          _message = 'The password provided is weak';
         });
       } else if (e.code == 'email-already-in-use') {
         setState(() {
