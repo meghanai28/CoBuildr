@@ -30,4 +30,6 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
-  uses-material-design: true #this file specifies basic info about the app (version, dependencies, assets)
+  uses-material-design: true
+  assets:
+    - assets/PDF_file_icon.svg.png

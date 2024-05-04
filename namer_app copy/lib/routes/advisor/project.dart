@@ -149,7 +149,7 @@ class IndividualProjectPage extends StatelessWidget {
                     width: 50,
                     height: 50,
                     color: Color.fromARGB(255, 235, 231, 231),
-                    child: Image.asset('pdf_image.png'), // Change to your PDF image
+                    child: Image.asset('assets/PDF_file_icon.svg.png'), // Change to your PDF image
                   ),
                 ),
                 SizedBox(width: 50),
@@ -162,7 +162,7 @@ class IndividualProjectPage extends StatelessWidget {
                     width: 50,
                     height: 50,
                     color: Color.fromARGB(255, 235, 231, 231),
-                    child: Image.asset('pdf_image.png'), // Change to your PDF image
+                    child: Image.asset('assets/PDF_file_icon.svg.png'), // Change to your PDF image
                   ),
                 ),
                 SizedBox(width: 50),
@@ -175,7 +175,7 @@ class IndividualProjectPage extends StatelessWidget {
                     width: 50,
                     height: 50,
                     color: Color.fromARGB(255, 235, 231, 231),
-                    child: Image.asset('PDF_file_icon.svg.png'), // Change to your PDF image
+                    child: Image.asset('assets/PDF_file_icon.svg.png'), // Change to your PDF image
                   ),
                 ),
               ],
