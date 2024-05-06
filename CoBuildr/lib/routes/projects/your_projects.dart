@@ -10,7 +10,7 @@ class YourProjectsPage extends StatefulWidget {
 }
 
 class _YourProjectsPageState extends State<YourProjectsPage> {
-  int _currentIndex = 2; // Default selected index
+  int _currentIndex = 2; // index 2
   final FirebaseAuth _auth = FirebaseAuth.instance; // create instance of authentication to be used to get current user
 
   @override
@@ -27,8 +27,8 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Your Projects',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'Published Projects',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.purple),
             ),
           ),
           Expanded(
@@ -39,7 +39,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               'Drafts',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.purple),
             ),
           ),
           Expanded(
@@ -112,63 +112,93 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
         }
 
         final projects = snapshot.data!.docs; //get published projects
-        return ListView.builder( // build a list of all projects (like how we see in imessages)
-          itemCount: projects.length,
-          itemBuilder: (context, index) {
-            final projectData = projects[index].data()! as Map<String, dynamic>; // get each project data
-            final teammates = projectData['teammates'];
-            final projectId = projects[index].id;
-            if(projectData['userId'] == _auth.currentUser!.uid)
-            {
-              return ListTile(
-                leading: Icon(
-                  Icons.key, // star
-                  color: Colors.amber, // color
+        return ScrollbarTheme(
+          data: ScrollbarThemeData(
+                  thumbVisibility: MaterialStateProperty.all<bool>(true),// Adjust the thickness of the scrollbar
                 ),
-               title: Text(projectData['title']), // the title of the list will be the project name
-               onTap: () {
-                Navigator.push(
-                  context, // push to the chat details page
-                  MaterialPageRoute(
-                    builder: (context) => ProjectDetails(
-                      projectId: projectId, 
-                      owner: true, 
-                      published: published
-                    )
-                  ),
+          child : ListView.builder( // build a list of all projects (like how we see in imessages)
+            itemCount: projects.length,
+            itemBuilder: (context, index) {
+              final projectData = projects[index].data()! as Map<String, dynamic>; // get each project data
+              final teammates = projectData['teammates'];
+              final projectId = projects[index].id;
+              if(projectData['userId'] == _auth.currentUser!.uid)
+              {
+                return Column (
+                  children: [
+                    ListTile(
+                      title:  _buildProjectTile(projectData['title'], 'Owner',projectId, true), // the title of the list will be the project name 
+                    ),
+                    Divider(
+                      color: Colors.grey[400],
+                      height: 0,
+                      thickness: 0.5,
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                  ]
                 );
-               } , 
-              );
-            }
-            else if(teammates != null && teammates.contains(_auth.currentUser!.uid))
-            {
-              return ListTile(
-               title: Text(projectData['title']), // the title of the list will be the project name
-               onTap: () {
-                Navigator.push(
-                  context, // push to the chat details page
-                  MaterialPageRoute(
-                    builder: (context) => ProjectDetails(
-                      projectId: projectId, 
-                      owner: false, 
-                      published: published
-                    )
-                  ),
+              }
+              else if(teammates != null && teammates.contains(_auth.currentUser!.uid))
+              {
+                return Column(
+                  children: [
+                    ListTile(
+                      title:  _buildProjectTile(projectData['title'], 'Teammate',projectId, false), // the title of the list will be the project name
+                    ),
+                    Divider(
+                      color: Colors.grey[400],
+                      height: 0,
+                      thickness: 0.5,
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                  ]
                 );
-               } , 
-              );
-            }
-            else 
-            {
+              }
+              else 
+              {
                 return Container(); 
+              }
             }
-            
-
-          }
+          )
         );
+      }    
+    );
+  }
 
-      }
-        
+    Widget _buildProjectTile(String projectName, String projectDescription, String projectId, bool owned) {
+    return ListTile(
+      leading: _buildSquare(), // Add light purple square
+      title: Text(
+        projectName,
+        style: TextStyle(fontWeight: FontWeight.bold), // Make "Project" bold
+      ),
+      subtitle: Text(projectDescription), // Add project description
+      onTap: () {
+        Navigator.push(
+                  context, // push to the chat details page
+                  MaterialPageRoute(
+                    builder: (context) => ProjectDetails(
+                      projectId: projectId, 
+                      owner: owned, 
+                      published: true
+                    )
+                  ),
+                );
+      },
+      trailing: Icon(
+        Icons.arrow_forward, // arrow icon
+        color: Colors.purple,
+      ),
+    );
+  }
+
+  Widget _buildSquare() {
+    return Container(
+      width: 50,
+      height: 50,
+      color: Colors.purple[200],
     );
   }
 

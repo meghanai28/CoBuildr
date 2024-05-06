@@ -120,7 +120,7 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
 
   
 
-  Widget _buildProjectTile(String projectName, String projectDescription, String projectId) {
+    Widget _buildProjectTile(String projectName, String projectDescription, String projectId) {
     return ListTile(
       leading: _buildSquare(), // Add light purple square
       title: Text(
@@ -140,6 +140,10 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
                   ),
                 );
       },
+      trailing: Icon(
+        Icons.arrow_forward, // arrow icon
+        color: Colors.purple,
+      ),
     );
   }
 
