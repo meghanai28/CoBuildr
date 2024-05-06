@@ -35,6 +35,7 @@ class _ChatPageState extends State<AdvisorChatPage> {
         onPressed: () {
           _createNewChatDialog(context);
         },
+        mini: true, // mini smaller
         child: Icon(Icons.add, color: Colors.white),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -62,72 +63,124 @@ class _ChatPageState extends State<AdvisorChatPage> {
     );
   }
 
-  // build list of users that user is currently chatting with
+    // build list of users that user is currently chatting with
+    // build list of users that user is currently chatting with
   Widget _buildUserList() {
     ChatService _chatService = ChatService();
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(), // value that changes over time so we use stream builder (a dynamic list)
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}'); // show any errors
-        }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding
+      child : Container( // create container widget
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0), // padding
+        decoration: BoxDecoration( // color decoration
+          color: Colors.purple[50], // light purple 
+          borderRadius: BorderRadius.circular(8.0), // more circular cornoers
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10.0), // padding
+              child: Text(
+                'Contacts', // name of the pae
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, // make it bold
+                  fontSize: 20.0,
+                  color: Colors.purple, // bigger size
+                ),
+              ),
+            ),
+          
+            Expanded(
+              child: ScrollbarTheme(
+                data: ScrollbarThemeData(
+                  thumbVisibility: MaterialStateProperty.all<bool>(true),// Adjust the thickness of the scrollbar
+                ),
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance.collection('users').snapshots(), // value that changes over time so we use stream builder (a dynamic list)
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}'); // show any errors
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Text(''); // show loading if the data is still being loaded in
+                    }
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text(''); // show loading if the data is still being loaded in
-        }
-
-        final users = snapshot.data!.docs; // get the users
+                    final users = snapshot.data!.docs; // get the users
         
-        return ListView.builder( // build a list of all users (like how we see in imessages)
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            final userData = users[index].data()! as Map<String, dynamic>; // get each users data
-            if (_auth.currentUser!.email != userData['email'] && userData['uid'] != null) { // go through all emails that are not the current user
-              return FutureBuilder<bool>(
-                future: _chatService.hasChatMessages(userData['uid']),  // wait for this method to bring a result
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}'); // show any errors
-                  }
+                    return ListView.builder( // build a list of all users (like how we see in imessages)
+                    
+                      padding: EdgeInsets.only(right: 16.0),
+                      itemCount: users.length,
+                      itemBuilder: (context, index) {
+                        final userData = users[index].data()! as Map<String, dynamic>; // get each users data
+                        if (_auth.currentUser!.email != userData['email'] && userData['uid'] != null) { // go through all emails that are not the current user
+                          return FutureBuilder<bool>(
+                            future: _chatService.hasChatMessages(userData['uid']),  // wait for this method to bring a result
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}'); // show any errors
+                              }
                   
-                  if (snapshot.connectionState == ConnectionState.waiting) { // get connection state
-                    return const Text(''); // show loading if its loading
-                  }
+                              if (snapshot.connectionState == ConnectionState.waiting) { // get connection state
+                                return const Text(''); // show loading if its loading
+                              }
 
-                  final hasChatMessages = snapshot.data ?? false; // check if there is any data
-                  if (hasChatMessages) { // if there are chat messages show this on our chat page
-                    return ListTile(
-                      title: Text(userData['email']), // the title of the list will be the email
-                      onTap: () { // if they tap on the chat (on pressed used with buttons as done in my chatDetails page)
-                        Navigator.push(
-                          context, // push to the chat details page
-                          MaterialPageRoute(
-                            builder: (context) => ChatDetails(
-                              recieverUserEmail: userData['email'], // push the email and uid, as wanted in the chatDetails page
-                              recieverUserID: userData['uid'],
-                            ),
-                          ),
-                        );
+                              final hasChatMessages = snapshot.data ?? false; // check if there is any data
+                              if (hasChatMessages) { // if there are chat messages show this on our chat page
+                                return Material( // material so the flutter animation when hover shows up
+                                  color: Colors.transparent, // make transparent
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text(userData['email']), // the title of the list will be the email
+                                        onTap: () { // if they tap on the chat (on pressed used with buttons as done in my chatDetails page)
+                                          Navigator.push(
+                                            context, // push to the chat details page
+                                            MaterialPageRoute(
+                                              builder: (context) => ChatDetails(
+                                                recieverUserEmail: userData['email'], // push the email and uid, as wanted in the chatDetails page
+                                                recieverUserID: userData['uid'],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        trailing: Icon(
+                                          Icons.arrow_forward, // arrow icon
+                                          color: Colors.purple,
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0), // add more padding 
+                                      ),
+                                      Divider( // add a divider 
+                                        color: Colors.white,
+                                        thickness: 1.0,
+                                        height: 0.0,
+                                      ),
+                                    ]
+                                  )
+                                );
+                              } 
+                  
+                              else { // if there is no chat messages just return empty (we dont want to see it in our list)
+                                // empty
+                                return Container(); 
+                              }
+                            },
+                          );
+                        } 
+                        else { // if the user is the current user than just return empty (we dont want to message ourselves)
+                          // empty
+                          return Container();
+                        }
                       },
                     );
-                  } 
-                  
-                  else { // if there is no chat messages just return empty (we dont want to see it in our list)
-                    // empty
-                    return Container(); 
-                  }
-                },
-              );
-            } 
-            
-            else { // if the user is the current user than just return empty (we dont want to message ourselves)
-              // empty
-              return Container();
-            }
-          },
-        );
-      },
-    );
+                  },
+                )
+              )
+            )
+          ]
+        )
+      )
+    );     
   }
 
   // popup dialog for creating a new chat
@@ -191,7 +244,7 @@ class _ChatPageState extends State<AdvisorChatPage> {
                   if (recipientUserId != null) { // if the userId exists
                     await _chatService.sendMessage(recipientUserId, _messageController.text); // send the message using chatService
                       Navigator.of(context).pop();
-                      Navigator.pushNamed(context, '/chat');
+                      //Navigator.pushNamed(context, '/advisor_chat');
                   }
                     
                   else { // if it doesnt exist
