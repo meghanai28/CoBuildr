@@ -237,8 +237,8 @@ class _DashboardPageState extends State<DashboardPage> {
         },
         items: [
           _buildNavItem(Icons.dashboard, 'Dashboard'),
-          _buildNavItem(Icons.add, 'Create Project'),
-          _buildNavItem(Icons.list, 'Your Projects'),
+          _buildNavItem(Icons.add, 'Create'),
+          _buildNavItem(Icons.list, 'Projects'),
           _buildNavItem(Icons.message, 'Messages'),
           _buildNavItem(Icons.settings, 'Settings'),
         ],
@@ -251,7 +251,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return BottomNavigationBarItem(
       icon: Icon(
         icon,
-        color: Colors.purple,
+        color: const Color.fromRGBO(156, 39, 176, 1),
       ),
       label: label,
     );

@@ -31,3 +31,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true #this file specifies basic info about the app (version, dependencies, assets)
+  assets:
+    - assets/images/logo.png
