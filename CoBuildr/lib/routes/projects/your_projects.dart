@@ -166,40 +166,40 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
       }    
     );
   }
+  
+  Widget _buildLightBulb(bool owned) {
+    return Icon(
+      owned ? Icons.lightbulb : Icons.lightbulb_outline,
+      color: owned ? Colors.yellow : Colors.grey, // Fill with yellow if owned, otherwise outline in grey
+      size: 50,
+    );
+  }
 
-    Widget _buildProjectTile(String projectName, String projectDescription, String projectId, bool owned) {
+
+  Widget _buildProjectTile(String projectName, String projectDescription, String projectId, bool owned) {
     return ListTile(
-      leading: _buildSquare(), // Add light purple square
+      leading: _buildLightBulb(owned), // Use the lightbulb icon instead of the square
       title: Text(
         projectName,
-        style: TextStyle(fontWeight: FontWeight.bold), // Make "Project" bold
+        style: TextStyle(fontWeight: FontWeight.bold),
       ),
-      subtitle: Text(projectDescription), // Add project description
+      subtitle: Text(projectDescription),
       onTap: () {
         Navigator.push(
-                  context, // push to the chat details page
-                  MaterialPageRoute(
-                    builder: (context) => ProjectDetails(
-                      projectId: projectId, 
-                      owner: owned, 
-                      published: true
-                    )
-                  ),
-                );
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProjectDetails(
+              projectId: projectId, 
+              owner: owned, 
+              published: true
+            )
+          ),
+        );
       },
       trailing: Icon(
-        Icons.arrow_forward, // arrow icon
+        Icons.arrow_forward,
         color: Colors.purple,
       ),
     );
   }
-
-  Widget _buildSquare() {
-    return Container(
-      width: 50,
-      height: 50,
-      color: Colors.purple[200],
-    );
-  }
-
 }
