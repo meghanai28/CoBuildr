@@ -127,7 +127,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                 return Column (
                   children: [
                     ListTile(
-                      title:  _buildProjectTile(projectData['title'], 'Owner',projectId, true), // the title of the list will be the project name 
+                      title:  _buildProjectTile(projectData['title'], 'Owner',projectId, true,published), // the title of the list will be the project name 
                     ),
                     Divider(
                       color: Colors.grey[400],
@@ -144,7 +144,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                 return Column(
                   children: [
                     ListTile(
-                      title:  _buildProjectTile(projectData['title'], 'Teammate',projectId, false), // the title of the list will be the project name
+                      title:  _buildProjectTile(projectData['title'], 'Teammate',projectId, false, published), // the title of the list will be the project name
                     ),
                     Divider(
                       color: Colors.grey[400],
@@ -167,7 +167,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
     );
   }
 
-    Widget _buildProjectTile(String projectName, String projectDescription, String projectId, bool owned) {
+    Widget _buildProjectTile(String projectName, String projectDescription, String projectId, bool owned, bool published) {
     return ListTile(
       leading: _buildSquare(), // Add light purple square
       title: Text(
@@ -182,7 +182,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                     builder: (context) => ProjectDetails(
                       projectId: projectId, 
                       owner: owned, 
-                      published: true
+                      published: published
                     )
                   ),
                 );
