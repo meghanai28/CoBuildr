@@ -23,7 +23,6 @@ class _EditProfileState extends State<EditProfile> {
 
   String _email = ""; // this is where we keep the email
   String _userType = ""; // this is where we store the user type
-  String _pfp = ""; // for the pfp
 
   @override
   void initState() {
@@ -43,7 +42,6 @@ class _EditProfileState extends State<EditProfile> {
       setState(() { // makes updates to ui by recreating the widget
         _email = userProfile['email']; // get email
         _userType = userProfile['userType']; // get the usertpe
-        _pfp = userProfile['profilePictureUrl']; // get the profile picture
         _nameController.text = userProfile['name'] ?? ''; // set the name if the name has been updated before
         _schoolController.text = userProfile['school'] ?? ''; // set the school if the school has been added before
         _majorController.text = userProfile['major'] ?? ''; // set the major if the major has been set before
@@ -86,7 +84,14 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
-        title: const Text('Edit Profile'), // name of the page
+         title: Center(
+          child: Text(
+            'Settings',
+            style: TextStyle(
+              color: const Color.fromARGB(255, 111, 15, 128), 
+            ),
+          ),
+        ), // name of the page
       ),
       body: SingleChildScrollView( // this is what we use to let the user scroll
         child: Form( // we r basically creting a form
@@ -123,52 +128,77 @@ class _EditProfileState extends State<EditProfile> {
                 ), 
               ),
               
-              Padding( // padding so that the header touches both ends but the form doesnt so it doesnt look weird
-                padding:  const EdgeInsets.all(19.0), // add the padding
-                child: Column ( // multiple children in the form so we create another child element
-                  children: [
-                    const SizedBox(height: 15.0), 
-                    TextFormField( // name field in the form
-                      controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Name'),
-                    ),
+              Padding( // padding so that the header touches both ends but the form doesn't so it doesn't look weird
+                padding: const EdgeInsets.all(19.0), // add the padding
+                  child: Column ( // multiple children in the form so we create another child element
+                    crossAxisAlignment: CrossAxisAlignment.start, // align labels to the left
+                    children: [
+                      _buildInputLabel('Name'), // text label for Name
+                      TextFormField( // name field in the form
+                        controller: _nameController,
+                      ),
 
-                    const SizedBox(height: 9.0),
-                    TextFormField( // school field in the form
-                      controller: _schoolController,
-                      decoration: const InputDecoration(labelText: 'University'),
-                    ),
+                      const SizedBox(height: 9.0),
+                      _buildInputLabel('University'), // text label for University
+                      TextFormField( // school field in the form
+                        controller: _schoolController,
+                      ),
 
-                    const SizedBox(height: 9.0),
-                    TextFormField( // field for major
-                      controller: _majorController,
-                      decoration: const InputDecoration(labelText: 'Major'),
-                    ),
+                      const SizedBox(height: 9.0),
+                      _buildInputLabel('Major'), // text label for Major
+                      TextFormField( // field for major
+                        controller: _majorController,
+                      ),
 
-                    const SizedBox(height: 9.0),
-                    TextFormField( // field for skills
-                      controller: _skillsController,
-                      decoration: const InputDecoration(labelText: 'Skills (comma separated)'),
-                    ),
+                      const SizedBox(height: 9.0),
+                      _buildInputLabel('Skills (comma separated)'), // text label for Skills
+                      TextFormField( // field for skills
+                        controller: _skillsController,
+                      ),
 
-                    const SizedBox(height: 9.0),
-                    TextFormField( // field for bio
-                      controller: _bioController,
-                      decoration: const InputDecoration(labelText: 'Bio'),
-                      maxLines: 5, // let it go for 5 lines instead of doing the weird sliding thing to the right. (do it vertically)
-                    ),
-
-                    const SizedBox(height: 25.0),
-                    ElevatedButton( // save all the users edits button
-                      onPressed: () async {
-                          _saveEdits(); // call the save edits so changes r saved
-                        },
-                    child: const Text('Save Edits'),
-                    ),
+                      const SizedBox(height: 9.0),
+                      Text(
+                        'Bio',
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 111, 15, 128),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox( // styled bio input field
+                        height: 80,
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          thickness: 4.0,
+                          radius: Radius.circular(6.0),
+                          child: TextFormField(
+                            controller: _bioController,
+                            maxLines: null,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15.0),
+                      Center(
+                        child:Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed:() async{
+                                _saveEdits();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 111, 15, 128),
+                              ),
+                              child: const Text(
+                                'Save Edits',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ) 
               ),
-                
             ],
           ),
         ),
@@ -194,8 +224,8 @@ class _EditProfileState extends State<EditProfile> {
         },
         items: [
           _buildNavItem(Icons.dashboard, 'Dashboard'),
-          _buildNavItem(Icons.add, 'Create Project'),
-          _buildNavItem(Icons.list, 'Your Projects'),
+          _buildNavItem(Icons.add, 'Create'),
+          _buildNavItem(Icons.list, 'Projects'),
           _buildNavItem(Icons.message, 'Messages'),
           _buildNavItem(Icons.settings, 'Settings'),
         ],
@@ -204,13 +234,28 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
+Widget _buildInputLabel(String labelText) {
+  return Text(
+    labelText,
+    style: TextStyle(
+      color: const Color.fromARGB(255, 111, 15, 128), // set label text color to purple
+      fontSize: 16, // adjust font size as needed
+      fontWeight: FontWeight.bold, // make it bold
+    ),
+  );
+}
 
   // create the pfp (i orginally did another query here which is why I created a helper method!)
   Widget _createPFP() {
     return CircleAvatar(
       radius: 50,
-      backgroundImage: NetworkImage(_pfp),
-    ); 
+      backgroundColor:  const Color.fromARGB(255, 111, 15, 128), // set background color
+      child: Icon(
+        Icons.person,
+        size: 60, // adjust icon size as needed
+        color: Colors.white, // set icon color
+      ),
+    );
   }
        
 
@@ -224,10 +269,3 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 }
-
-
-
-
-
-
-

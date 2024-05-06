@@ -83,7 +83,14 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dashboard'),
+        title: Center(
+          child: Text(
+            'Dashboard',
+            style: TextStyle(
+              color: const Color.fromARGB(255, 111, 15, 128), 
+            ),
+          ),
+        ), // name of the page
         automaticallyImplyLeading: false,
       ),
       body: _projects.isEmpty

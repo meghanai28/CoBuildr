@@ -19,7 +19,14 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
-        title: const Text('Chat Page'), // name of the page
+        title: Center(
+          child: Text(
+            'Messages',
+            style: TextStyle(
+              color: const Color.fromARGB(255, 111, 15, 128), 
+            ),
+          ),
+        ), // name of the page
       ),
 
       body: Column( // show the list of the users that the current user has messages with
@@ -31,7 +38,7 @@ class _ChatPageState extends State<ChatPage> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromARGB(255, 219, 110, 255),
+        backgroundColor: Color.fromARGB(255, 111, 15, 128),
         onPressed: () {
           _createNewChatDialog(context);
         },
@@ -57,8 +64,8 @@ class _ChatPageState extends State<ChatPage> {
         },
         items: [
           _buildNavItem(Icons.dashboard, 'Dashboard'),
-          _buildNavItem(Icons.add, 'Create Project'),
-          _buildNavItem(Icons.list, 'Your Projects'),
+          _buildNavItem(Icons.add, 'Create'),
+          _buildNavItem(Icons.list, 'Projects'),
           _buildNavItem(Icons.message, 'Messages'),
           _buildNavItem(Icons.settings, 'Settings'),
         ],
@@ -88,7 +95,7 @@ class _ChatPageState extends State<ChatPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold, // make it bold
                   fontSize: 20.0,
-                  color: Colors.purple, // bigger size
+                  color: const Color.fromARGB(255, 111, 15, 128),  // bigger size
                 ),
               ),
             ),

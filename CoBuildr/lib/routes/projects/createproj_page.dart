@@ -56,6 +56,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Project ${isDraft ? 'saved' : 'published'} successfully')),
       );
+      
+      Navigator.pushNamed(context, '/yourProjects');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error ${isDraft ? 'saving' : 'publishing'} project')),

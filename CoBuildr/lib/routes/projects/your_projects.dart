@@ -18,7 +18,14 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Projects'),
+        title: Center(
+          child: Text(
+            'Projects',
+            style: TextStyle(
+              color: const Color.fromARGB(255, 111, 15, 128), 
+            ),
+          ),
+        ),
         automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
       ),
       body: Column(
