@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
@@ -14,7 +15,8 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  
+  bool showNotification = false; 
+
   final _nameController = TextEditingController(); // where name is inputted
   final _schoolController = TextEditingController(); // where school is inputed
   final _majorController = TextEditingController(); // where major is inputted
@@ -111,6 +113,33 @@ class _EditProfileState extends State<EditProfile> {
                           Navigator.pushNamed(context, '/welcome'); // navigate to the login button
                         },
                       ),
+                    ),
+
+                    Align(
+                        alignment: Alignment.topLeft,
+                        child: Stack(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.notifications), 
+                              onPressed: () {
+                                _showNotificationsDialog(context); 
+                              },
+                            ),
+                          if(showNotification)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.red, 
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                     ),
 
                     Center( // aligned to the center
@@ -268,4 +297,146 @@ Widget _buildInputLabel(String labelText) {
       label: label,
     );
   }
+
+  void _handleNewNotification() {
+    setState(() {
+      showNotification = true; 
+    });
+  }
+
+ Future<List<Map<String, dynamic>>> _fetchNotifications() async {
+  try {
+    String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('notifications')
+        .where('recipientId', isEqualTo: currentUserId)
+        .get(); // Query only notifications intended for the current user
+    List<Map<String, dynamic>> notifications = [];
+    querySnapshot.docs.forEach((doc) {
+      print('Notification data: ${doc.data()}');
+      notifications.add({
+        'message': doc['message'],
+        'read': doc['read'],
+        'recipientId': doc['recipientId'],
+        'timestamp': doc['timestamp'],
+      });
+    });
+    return notifications.isNotEmpty ? notifications : [];
+  } catch (e) {
+    print('Error fetching notifications: $e');
+    return [];
+  }
+}
+
+//   void _showNotificationsDialog(BuildContext context) {
+//   showDialog(
+//     context: context,
+//     builder: (BuildContext context) {
+//       Future<List<Map<String, dynamic>>> notificationsFuture = _fetchNotifications();
+
+//       return StatefulBuilder(
+//         builder: (context, setState) {
+//           return AlertDialog(
+//             title: Text('Notifications'),
+//             content: Container(
+//               width: double.maxFinite, // Ensure content takes up full width
+//               height: 200, // Specify a fixed height for the content area
+//               child: FutureBuilder(
+//                 future: notificationsFuture,
+//                 builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+//                   if (snapshot.connectionState == ConnectionState.waiting) {
+//                     return Center(child: CircularProgressIndicator());
+//                   } else if (snapshot.hasError) {
+//                     return Text('Error: ${snapshot.error}');
+//                   } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+//                     return Text('No notifications found.');
+//                   } else {
+//                     return SingleChildScrollView( // Use SingleChildScrollView for scrolling
+//                       child: SizedBox(
+//                         height: 180, // Adjust height to accommodate content
+//                         child: Column(
+//                           children: snapshot.data!.map((notification) {
+//                             return ListTile(
+//                               title: Text(notification['message'] ?? ''),
+//                             );
+//                           }).toList(),
+//                         ),
+//                       ),
+//                     );
+//                   }
+//                 },
+//               ),
+//             ),
+//             actions: <Widget>[
+//               TextButton(
+//                 onPressed: () {
+//                   Navigator.pop(context);
+//                 },
+//                 child: Text('Close'),
+//               ),
+//             ],
+//           );
+//         },
+//       );
+//     },
+//   );
+// }
+
+
+
+// Assuming this function is inside your StatefulWidget class
+void _showNotificationsDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Notifications'),
+        content: Container(
+          width: double.maxFinite,
+          height: 200,
+          child: FutureBuilder(
+            future: _fetchNotifications(),
+            builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                return Text('No notifications found.');
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final notification = snapshot.data![index];
+                    final timestamp = notification['timestamp'].toDate(); // converts firestore timestamp to datetime
+                    //final formattedTime = '${timestamp.hour}:${timestamp.minute}'; 
+                    return Container(
+                      margin: EdgeInsets.symmetric(vertical: 4.0), 
+                      child: ListTile(
+                        title: Text(notification['message'] ?? ''),
+                        subtitle: Text('${timestamp.hour}:${timestamp.minute}'),
+                        leading: Icon(Icons.notifications),
+                      ),
+                    );
+                  },
+                );
+              }
+            },
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text('Close'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
 }

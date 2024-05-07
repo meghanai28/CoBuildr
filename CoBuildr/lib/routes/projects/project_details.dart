@@ -22,6 +22,7 @@ class ProjectDetails extends StatefulWidget {
 }
 
 class _ProjectDetailsState extends State<ProjectDetails> {
+  bool showNotification = false; 
 
   final TextEditingController _titleController = TextEditingController(); // title controller
   final TextEditingController _filtersController = TextEditingController(); // tags controller
@@ -33,6 +34,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   void initState() {
     super.initState();
     _getAndSetProject(); // when we initalize we also want to intalize w the data of the project
+    //_checkUnreadNotifications(); 
   }
 
   // get/set the data of the project
@@ -678,6 +680,8 @@ void _acceptRequest(String userId, Map<String, dynamic> projectData) async {
     SnackBar(content: Text('Request accepted')), // confirm
   );
 
+  await _sendNotification(userId, 'You have been accepted into the project team.', widget.projectId); 
+
   setState(() {}); // refresh the container after ever change
 
 }
@@ -827,7 +831,6 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
   );
 }
 
-
   List<Widget> _buildTagsSkill(String skillsText) {
     final tags = skillsText.split(',').map((tag) => tag.trim()).toList();
     return tags.map((tag) {
@@ -857,4 +860,40 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
       );
     }).toList();
   } 
+
+  Future<void> _sendNotification(String userId, String message, String projectId) async { 
+    DocumentSnapshot projectSnapshot = await FirebaseFirestore.instance
+      .collection('published_projects')
+      .doc(projectId)
+      .get(); 
+
+      if(projectSnapshot.exists) {
+        String projectTitle = projectSnapshot.get('title'); 
+      
+        Map<String, dynamic> notificationData = { //constructs a notification document
+          'recipientId': userId, 
+          'message': 'You have been accepted into $projectTitle', // Include the project title in the message
+          'projectId': projectId,
+          'timestamp': DateTime.now(),
+          'read': false, // Mark notification as unread 
+        }; 
+
+        await FirebaseFirestore.instance.collection('notifications').add(notificationData);  //add notification document to Firestore
+      } else {
+        print('Project with ID $projectId does not exist'); 
+      }
+    
+  }
+
+  // Future<void> _checkUnreadNotifications() async {
+  //   QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+  //     .collection('notifications')
+  //     .where('recipientId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+  //     .where('read', isEqualTo: false)
+  //     .get(); 
+
+  //     setState(() {
+  //       showNotification = snapshot.docs.isNotEmpty; 
+  //     });
+  // }
 }
