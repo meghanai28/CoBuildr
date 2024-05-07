@@ -110,7 +110,10 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                   ),
               ) ;
               },
-              child: Text('Request Advisor'),
+              style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 151, 36, 171)
+                    ),
+                  child: Text('Request Advisor', style: TextStyle(color: Colors.white)),
             );
           }
           else{
@@ -132,7 +135,8 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                      Text(active ? "Current Advisor:" : "Request Advisor (waiting for response):"),
+                      Text(active ? "Current Advisor:" : "Request Advisor (waiting for response):", style: TextStyle(fontWeight: FontWeight.bold, 
+                        color: const Color.fromARGB(255, 111, 15, 128),)),
                       ListTile(
                         title: Text(userProfile['email']), // tite
                         onTap: () async {
@@ -143,12 +147,10 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                   );
                 }
               }
-    
           );
         }
       },
     );
-    
   }
 
   // save changes to data
@@ -251,85 +253,236 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     
   }
 
-
-
-  // build the layout for the chat room (this is the chat details page)
-  @override
-  Widget build (BuildContext context) {
-    return Scaffold(
-      
+@override
+Widget build(BuildContext context) {
+  return Scrollbar(
+    thumbVisibility: true,
+    thickness: 10,
+    child: Scaffold(
       appBar: AppBar(
-        title: Text(_titleController.text),// get rid of back button for now (so buggy)
-      ), // title will be name of the recieverUserId
-
-
-      body: SingleChildScrollView( // scrollable
+        title: Text(
+          _titleController.text,
+          style: TextStyle(
+            color: const Color.fromARGB(255, 111, 15, 128),
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            widget.owner
+                ? TextFormField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      labelText: 'Project Title',
+                      labelStyle: TextStyle(
+                        color: const Color.fromARGB(255, 111, 15, 128),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                : SizedBox(height: 0), // Hide Project Title for teammates
 
-            widget.owner ? TextFormField(
-              controller: _titleController, // title text field
-              decoration: InputDecoration(labelText: 'Project Title'),
-            ) : Text('Project Title: ${_titleController.text}'),
+            !widget.owner
+              ? FutureBuilder<DocumentSnapshot>(
+                  future: _getProjectData(), // Fetch project data
+                  builder: (context, projectSnapshot) {
+                    if (projectSnapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (projectSnapshot.hasError) {
+                      return Text('Error: ${projectSnapshot.error}');
+                    } else {
+                      var projectProfile = projectSnapshot.data!.data() as Map<String, dynamic>;
+                      final ownerUserId = projectProfile['userId'];
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: _getUserData(ownerUserId), // Fetch owner's data
+                        builder: (context, userSnapshot) {
+                          if (userSnapshot.connectionState == ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (userSnapshot.hasError) {
+                            return Text('Error: ${userSnapshot.error}');
+                          } else {
+                            var ownerProfile = userSnapshot.data!.data() as Map<String, dynamic>;
+                            final ownerName = ownerProfile['name'] ?? ''; // Get owner's name
+                            return Row(
+                              children: [
+                                Text(
+                                  'Project Owner: ',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: const Color.fromARGB(255, 111, 15, 128),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  ownerName,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                SizedBox(width: 8), // Add spacing between name and icon
+                                GestureDetector( // Eye icon for viewing owner's profile
+                                  onTap: () async {
+                                    _showProfile(context, ownerProfile); // Show owner's profile
+                                  },
+                                  child: Icon(Icons.remove_red_eye, color: Colors.black),
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      );
+                    }
+                  },
+                )
+              : Container(),
 
             SizedBox(height: 20.0),
-            !widget.owner ? Text('Filters:') : Container(),
-            
-            widget.owner ? TextFormField(
-              controller: _filtersController, // filters text field
-              decoration: InputDecoration(labelText: 'Project Filters'),
-            ): Row( children: _buildTags(), ),
-            
+
+            !widget.owner
+                ? Text(
+                    'Project Tags:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(255, 111, 15, 128),
+                    ),
+                  )
+                : Container(),
+
+            widget.owner
+                ? TextFormField(
+                    controller: _filtersController,
+                    decoration: InputDecoration(
+                      labelText: 'Project Tags',
+                      labelStyle: TextStyle(
+                        color: const Color.fromARGB(255, 111, 15, 128),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                : Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: _buildTags(),
+                  ),
             SizedBox(height: 20.0),
-            widget.owner ? TextFormField(
-              controller: _descriptionController, // description text field
-              decoration: InputDecoration(labelText: 'Description'),
-              maxLines: 5,
-            ) : Text('Description: ${_descriptionController.text}'),
+            widget.owner
+                ? Scrollbar(
+                    thumbVisibility: true,
+                    thickness: 10,
+                    child: TextFormField(
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
+                        labelText: 'Description',
+                        labelStyle: TextStyle(
+                          color: const Color.fromARGB(255, 111, 15, 128),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      maxLines: 3,
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Description:',
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 111, 15, 128),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        _descriptionController.text,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
 
             SizedBox(height: 20.0),
-            widget.published ? Text('Teammates:'): Container(),
-            widget.published ?_buildTeammatesList(): Container(),
-            
+
+            widget.published
+                ? Text(
+                    'Teammates:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(255, 111, 15, 128),
+                    ),
+                  )
+                : Container(),
+
+            widget.published ? _buildTeammatesList() : Container(),
+
             widget.published && widget.owner ? SizedBox(height: 20.0) : Container(),
-            widget.published && widget.owner ? Text('Requests:') : Container(),
-            widget.published && widget.owner ?_buildLikersList(): Container(),
 
-            SizedBox(height: 20.0),
-            widget.published ? _getAdvisor(): Container(),
+            widget.published && widget.owner
+                ? Text(
+                    'Teammate Requests:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(255, 111, 15, 128),
+                    ),
+                  )
+                : Container(),
+
+            widget.published && widget.owner ? _buildLikersList() : Container(),
+
+            SizedBox(height: 15.0),
+
+            widget.published ? _getAdvisor() : Container(),
             widget.published ? SizedBox(height: 20.0) : Container(),
 
-            widget.owner ? SizedBox(height: 20.0) : Container(),
-            widget.owner ? Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton( // save edits button
-                  onPressed: () => _saveEdits(), 
-                  child: Text('Save Edits'),
-                ),
-                
-                !widget.published ? ElevatedButton( // publish drafts button only if its draft
-                  onPressed: () => _publishProject(), 
-                  child: Text('Publish'),
-                ) : Container(),
+            widget.published ? SizedBox(height: 20.0) : Container(),
 
-                ElevatedButton(
-                  onPressed: () => _deleteDialog(context), // delete button
-                  child: Text('Delete'),
-                ),
-
-              ],
-            ): Container(),
+            widget.owner
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _saveEdits(),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(120, 48),
+                          backgroundColor: const Color.fromARGB(255, 111, 15, 128),
+                        ),
+                        child: Text('Save Edits', style: TextStyle(color: Colors.white)),
+                      ),
+                      !widget.published
+                          ? ElevatedButton(
+                              onPressed: () => _publishProject(),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(120, 48),
+                                backgroundColor: const Color.fromARGB(255, 111, 15, 128),
+                              ),
+                              child: Text('Publish', style: TextStyle(color: Colors.white)),
+                            )
+                          : Container(),
+                      ElevatedButton(
+                        onPressed: () => _deleteDialog(context),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(120, 48),
+                          backgroundColor: const Color.fromARGB(255, 111, 15, 128),
+                        ),
+                        child: Text('Delete', style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  )
+                : Container(),
           ],
         ),
       ),
-      
-    );
-      
-  }
-
+    ),
+  );
+}
 
   // popup dialog for creating a new chat
   void _deleteDialog(BuildContext context) {
@@ -364,100 +517,137 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   }
 
 Widget _buildTeammatesList() {
-  final docRef = FirebaseFirestore.instance.collection('published_projects').doc(widget.projectId); // get the project
-  return Container( // return a container
-    height: 90,
-    child: FutureBuilder<DocumentSnapshot>( // just get the data once
-      future: docRef.get(), // get the data
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text(""); // show nothing when loading
-        } 
-        else {
-          final projectData = snapshot.data!.data()! as Map<String, dynamic>; // get the project data
-          final teammates = projectData['teammates'] as List<dynamic>; //get the list
-          
-          return ListView.builder( // create list
-            itemCount: teammates.length, // length of likers
-            itemBuilder: (context, index) {
-              final teammateId = teammates[index]; // get the id
-              return FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance.collection('users').doc(teammateId).get(), // get user data once
-                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnapshot) {
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                    return Text(""); // show nothing when loading
-                  } 
-                  else {
-                    final userData = userSnapshot.data!.data()! as Map<String, dynamic>;
-                    final email = userData['email'];
-                    return ListTile(
-                      title: Text(email), // make the title the email
-                      onTap: () async {
-                        _showProfile(context, userData); // do a pop up dialog to show the data of the person requested
-                      },
-                    );
-                  }
-                },
-              );
-            },
-          );
-        }
-      },
+  final docRef = FirebaseFirestore.instance.collection('published_projects').doc(widget.projectId);
+  return Container(
+    height: 150,
+    child: Scrollbar(
+      thumbVisibility: true,
+      thickness: 10,
+      child: FutureBuilder<DocumentSnapshot>(
+        future: docRef.get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            final projectData = snapshot.data!.data()! as Map<String, dynamic>;
+            final teammates = projectData['teammates'] as List<dynamic>;
+
+            return ListView.separated( // Using ListView.separated to add dividers
+              itemCount: teammates.length,
+              separatorBuilder: (context, index) => Divider(), // Divider between each item
+              itemBuilder: (context, index) {
+                final teammateId = teammates[index];
+                return FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance.collection('users').doc(teammateId).get(),
+                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnapshot) {
+                    if (userSnapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else {
+                      final userData = userSnapshot.data!.data()! as Map<String, dynamic>;
+                      final name = userData['name'] ?? ''; // Use name instead of email
+                      return ListTile(
+                          title: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                _showProfile(context, userData); // Call _showProfile on eye icon tap
+                              },
+                              child: Icon(Icons.remove_red_eye),
+                            ),
+                            SizedBox(width: 5),
+                            Text(name),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                );
+              },
+            );
+          }
+        },
+      ),
     ),
   );
 }
 
-
-// build the request list (those who liked the project)
 Widget _buildLikersList() {
-  final docRef = FirebaseFirestore.instance.collection('published_projects').doc(widget.projectId); // get the project
-  return Container( // return a container
-    height: 90,
-    child: FutureBuilder<DocumentSnapshot>( // just get the data once
-      future: docRef.get(), // get the data
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text(""); // show nothing when loading
-        } 
-        else {
-          final projectData = snapshot.data!.data()! as Map<String, dynamic>; // get the project data
-          final likers = projectData['likers'] as List<dynamic>; //get the list
-          
-          return ListView.builder( // create list
-              itemCount: likers.length, // length of likers
+  final docRef = FirebaseFirestore.instance.collection('published_projects').doc(widget.projectId);
+  return Container(
+    height: 100,
+    child: Scrollbar(
+      thumbVisibility: true,
+      thickness: 10,
+      child: FutureBuilder<DocumentSnapshot>(
+        future: docRef.get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            final projectData = snapshot.data!.data()! as Map<String, dynamic>;
+            final likers = projectData['likers'] as List<dynamic>;
+
+            return ListView.builder(
+              itemCount: likers.length,
               itemBuilder: (context, index) {
-                final likerId = likers[index]; // get the id
+                final likerId = likers[index];
                 return FutureBuilder<DocumentSnapshot>(
-                  future: FirebaseFirestore.instance.collection('users').doc(likerId).get(), // get user data once
+                  future: FirebaseFirestore.instance.collection('users').doc(likerId).get(),
                   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnapshot) {
                     if (userSnapshot.connectionState == ConnectionState.waiting) {
-                      return Text(""); // show nothing when loading
-                    } 
-                    else {
+                      return CircularProgressIndicator();
+                    } else {
                       final userData = userSnapshot.data!.data()! as Map<String, dynamic>;
-                      final email = userData['email'];
+                      final name = userData['name'] ?? '';
                       return ListTile(
-                        title: Text(email), // make the title the email
-                        trailing: Row(  // at the end create a row of two buttons to accept and decline the user
+                        title: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                _showProfile(context, userData); // Show profile on eye icon tap
+                              },
+                              child: Icon(Icons.remove_red_eye), // Eye icon
+                            ),
+                            SizedBox(width: 5),
+                            Text(name),
+                          ],
+                        ),
+                        trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                _acceptRequest(likerId, projectData); // accept button
+                            GestureDetector(
+                              onTap: () {
+                                _acceptRequest(likerId, projectData);
                               },
-                              child: Text('Accept'),
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.green, // Green circle
+                                ),
+                                child: Icon(Icons.check, size: 20, color: Colors.white), // Checkmark icon
+                              ),
                             ),
                             SizedBox(width: 8),
-                            ElevatedButton(
-                              onPressed: () {
-                                _declineRequest(likerId, projectData); // decline button
+                            GestureDetector(
+                              onTap: () {
+                                _declineRequest(likerId, projectData);
                               },
-                              child: Text('Decline'),
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.red, // Red circle
+                                ),
+                                child: Icon(Icons.clear, size: 20, color: Colors.white), // X icon
+                              ),
                             ),
                           ],
                         ),
                         onTap: () async {
-                          _showProfile(context, userData); // do a pop up dialog to show the data of the person requested
+                          _showProfile(context, userData);
                         },
                       );
                     }
@@ -465,11 +655,13 @@ Widget _buildLikersList() {
                 );
               },
             );
-        }
-      },
+          }
+        },
+      ),
     ),
   );
 }
+
 
 void _acceptRequest(String userId, Map<String, dynamic> projectData) async {
   
@@ -509,81 +701,132 @@ void _declineRequest(String userId, Map<String, dynamic> projectData) async {
 }
 
 
-  void _showProfile(BuildContext context, Map<String, dynamic> val) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          contentPadding: EdgeInsets.zero,
-          title: Text('${val['email']}'), // show the email as title
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min, 
-            children: [
-              SizedBox(height: 16),
-              CircleAvatar(
-                backgroundImage: NetworkImage(val['profilePictureUrl']),
-                radius: 30,
-              ),
-              SizedBox(height: 16),
-              _buildProfileItem('Name', '${val['name']}'== 'null' ? '' : '${val['name']}'), // show the name
-              _buildProfileItem('User Type', '${val['userType']}'== 'null' ? '' : '${val['userType']}'), // show the user type
-              _buildProfileItem('University', '${val['school']}'== 'null' ? '' : '${val['school']}'), // show university
-              _buildProfileItem('Major', '${val['major']}'== 'null' ? '' : '${val['major']}'), // show the major
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+void _showProfile(BuildContext context, Map<String, dynamic> val) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        contentPadding: EdgeInsets.zero,
+        title: Center(
+          child: Text('${val['name']}', style: TextStyle(color: const Color.fromARGB(255, 111, 15, 128))),
+        ),
+        content: Scrollbar(
+          thumbVisibility: true, // Ensure the scrollbar is always visible
+          thickness: 8, // Set the thickness of the scrollbar
+          radius: Radius.circular(4), // Set the radius of the scrollbar
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 16),
+                CircleAvatar(
+                  backgroundImage: NetworkImage(val['profilePictureUrl']),
+                  radius: 30,
+                ),
+                SizedBox(height: 16),
+                _buildProfileItem('Email', '${val['email']}' == 'null' ? '' : '${val['email']}'),
+                _buildProfileItem('University', '${val['school']}' == 'null' ? '' : '${val['school']}'),
+                _buildProfileItem('Major', '${val['major']}' == 'null' ? '' : '${val['major']}'),
+                _buildProfileItem('Skills', '${val['skills']}' == 'null' ? '' : '${val['skills']}'), 
+                _buildProfileItem('Biography', '${val['bio']}' == 'null' ? '' : '${val['bio']}', isBiography: true), 
+              ],
+            ),
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Close"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
+Widget _buildProfileItem(String label, String value, {bool isBiography = false}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+    child: Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (label == 'Skills')
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  '$label:',
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 111, 15, 128),
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.start,
+                ),
+                SizedBox(height: 4),
+                Wrap(
+                  alignment: WrapAlignment.start,
+                  children: _buildTagsSkill(value),
+                ),
+              ],
+            )
+          else if (isBiography)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  '$label:',
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 111, 15, 128),
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.start,
+                ),
+                SizedBox(height: 4),
+                Container(
+                  height: 150,
+                  child: Scrollbar(
+                    thumbVisibility: true, // Ensure the scrollbar is always visible
+                    thickness: 8, // Set the thickness of the scrollbar
+                    radius: Radius.circular(4), // Set the radius of the scrollbar
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Text(
+                        value,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            RichText(
+              textAlign: TextAlign.start,
+              text: TextSpan(
+                style: TextStyle(color: Colors.black),
                 children: [
-                  Text(
-                    'Skills:',
+                  TextSpan(
+                    text: '$label: ',
                     style: TextStyle(
-                      color: Colors.purple,
+                      color: const Color.fromARGB(255, 111, 15, 128),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(width: 8),
-                  ..._buildTagsSkill('${val['skills']}'== 'null' ? '' : '${val['skills']}'),
+                  TextSpan(text: value),
                 ],
               ),
-              _buildProfileItem('Biography', '${val['bio']}' == 'null' ? '' : '${val['bio']}'), // show the bio
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(context), // when they exit just exit the popup dialog
-              child: Text("Close"),
             ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildProfileItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center, 
-          children: [
-            Text(
-              '$label:',
-              style: TextStyle(
-                color: Colors.purple,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(width: 8),
-            Text(
-              value,
-              softWrap: true,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   List<Widget> _buildTagsSkill(String skillsText) {
     final tags = skillsText.split(',').map((tag) => tag.trim()).toList();
@@ -613,10 +856,5 @@ void _declineRequest(String userId, Map<String, dynamic> projectData) async {
         child: Text(tag.toString()),
       );
     }).toList();
-  }
-
-
-
-
-  
+  } 
 }
