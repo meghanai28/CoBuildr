@@ -42,7 +42,19 @@ class _RequestAdvisorPageState extends State<RequestAdvisorPage> {
                   normal = false;
                 }
                 return ListTile(
-                  title: Text(userProfile['email']),
+                  title: 
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            _showProfile(context, userProfile); // Call _showProfile on eye icon tap
+                          },
+                          child: Icon(Icons.remove_red_eye),
+                        ),
+                        SizedBox(width: 10),
+                        Text(userProfile['email']),
+                      ],
+                    ),
                   subtitle: Text(userProfile['name'] ?? ''),
                   trailing: normal ? ElevatedButton(
                     onPressed: () {

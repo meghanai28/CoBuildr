@@ -117,7 +117,8 @@ class _ProjectDetailsState extends State<ProjectDetails> {
             );
           }
           else{
-            return Text('No current advisor');
+            return Text('No current advisor', style: TextStyle(fontWeight: FontWeight.bold, 
+                        color: const Color.fromARGB(255, 111, 15, 128),));
           }
         } 
         else {
@@ -138,10 +139,21 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                       Text(active ? "Current Advisor:" : "Request Advisor (waiting for response):", style: TextStyle(fontWeight: FontWeight.bold, 
                         color: const Color.fromARGB(255, 111, 15, 128),)),
                       ListTile(
-                        title: Text(userProfile['email']), // tite
-                        onTap: () async {
-                          _showProfile(context, userProfile); // call show profile here
-                        },
+                        title: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                _showProfile(context, userProfile); // Call _showProfile on eye icon tap
+                              },
+                              child: Icon(Icons.remove_red_eye),
+                            ),
+                            SizedBox(width: 10),
+                            Text(userProfile['email']),
+                          ],
+                        ),
+                        onTap: () {
+                          _showProfile(context, userProfile);
+                        }
                       ),
                     ],
                   );
@@ -290,7 +302,7 @@ Widget build(BuildContext context) {
                   future: _getProjectData(), // Fetch project data
                   builder: (context, projectSnapshot) {
                     if (projectSnapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Text('');
                     } else if (projectSnapshot.hasError) {
                       return Text('Error: ${projectSnapshot.error}');
                     } else {
@@ -300,7 +312,7 @@ Widget build(BuildContext context) {
                         future: _getUserData(ownerUserId), // Fetch owner's data
                         builder: (context, userSnapshot) {
                           if (userSnapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return Text('');
                           } else if (userSnapshot.hasError) {
                             return Text('Error: ${userSnapshot.error}');
                           } else {
@@ -527,7 +539,7 @@ Widget _buildTeammatesList() {
         future: docRef.get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return Text('');
           } else {
             final projectData = snapshot.data!.data()! as Map<String, dynamic>;
             final teammates = projectData['teammates'] as List<dynamic>;
@@ -541,7 +553,7 @@ Widget _buildTeammatesList() {
                   future: FirebaseFirestore.instance.collection('users').doc(teammateId).get(),
                   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnapshot) {
                     if (userSnapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Text('');
                     } else {
                       final userData = userSnapshot.data!.data()! as Map<String, dynamic>;
                       final name = userData['name'] ?? ''; // Use name instead of email
@@ -558,6 +570,9 @@ Widget _buildTeammatesList() {
                             Text(name),
                           ],
                         ),
+                        onTap: () {
+                          _showProfile(context, userData);
+                        }
                       );
                     }
                   },
@@ -582,7 +597,7 @@ Widget _buildLikersList() {
         future: docRef.get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return Text('');
           } else {
             final projectData = snapshot.data!.data()! as Map<String, dynamic>;
             final likers = projectData['likers'] as List<dynamic>;
@@ -595,7 +610,7 @@ Widget _buildLikersList() {
                   future: FirebaseFirestore.instance.collection('users').doc(likerId).get(),
                   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnapshot) {
                     if (userSnapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Text('');
                     } else {
                       final userData = userSnapshot.data!.data()! as Map<String, dynamic>;
                       final name = userData['name'] ?? '';
