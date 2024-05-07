@@ -134,7 +134,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                 return Column (
                   children: [
                     ListTile(
-                      title:  _buildProjectTile(projectData['title'], 'Owner',projectId, true), // the title of the list will be the project name 
+                      title:  _buildProjectTile(projectData['title'], 'Owner',projectId, true,published), // the title of the list will be the project name 
                     ),
                     Divider(
                       color: Colors.grey[400],
@@ -151,7 +151,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
                 return Column(
                   children: [
                     ListTile(
-                      title:  _buildProjectTile(projectData['title'], 'Teammate',projectId, false), // the title of the list will be the project name
+                      title:  _buildProjectTile(projectData['title'], 'Teammate',projectId, false, published), // the title of the list will be the project name
                     ),
                     Divider(
                       color: Colors.grey[400],
@@ -182,8 +182,7 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
     );
   }
 
-
-  Widget _buildProjectTile(String projectName, String projectDescription, String projectId, bool owned) {
+    Widget _buildProjectTile(String projectName, String projectDescription, String projectId, bool owned, bool published) {
     return ListTile(
       leading: _buildLightBulb(owned), // Use the lightbulb icon instead of the square
       title: Text(
@@ -193,15 +192,15 @@ class _YourProjectsPageState extends State<YourProjectsPage> {
       subtitle: Text(projectDescription),
       onTap: () {
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProjectDetails(
-              projectId: projectId, 
-              owner: owned, 
-              published: true
-            )
-          ),
-        );
+                  context, // push to the chat details page
+                  MaterialPageRoute(
+                    builder: (context) => ProjectDetails(
+                      projectId: projectId, 
+                      owner: owned, 
+                      published: published
+                    )
+                  ),
+                );
       },
       trailing: Icon(
         Icons.arrow_forward,
