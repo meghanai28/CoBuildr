@@ -150,6 +150,18 @@ class _EditProfileState extends State<EditProfile> {
                           Text('Email: $_email'), // email
                           const SizedBox(height: 9.0), // 19-10 = 9!
                           Text('User Type: $_userType'), // user type
+                          ElevatedButton(
+                            onPressed: () {
+                              _changePassword(); // Call method to change password
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white, // Change button color as desired
+                            ),
+                            child: Text(
+                              'Change Password',
+                              style: TextStyle(color: Colors.purple),
+                           ),
+                          ),
                         ],
                       )
                     )
@@ -382,6 +394,58 @@ Widget _buildInputLabel(String labelText) {
 //   );
 // }
 
+  void _changePassword() async {
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Confirm Password Reset"),
+          content: Text("Do you want to send a password reset email to $_email?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // cancel all changes
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _sendResetEmail(); 
+                Navigator.of(context).pop(); // finish the dialog/send email
+              },
+              child: Text("Confirm"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _sendResetEmail() async
+  {
+
+    try
+    {
+      // success
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: _email);
+     
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Password reset email sent. Please check your inbox.'),
+        duration: Duration(seconds: 3),
+      ));
+    }
+    
+    catch (e)
+    {
+      // failed 
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to send password reset email. Please try again later.'),
+        duration: Duration(seconds: 3),
+      ));
+    }
+     
+  }
 
 
 // Assuming this function is inside your StatefulWidget class
