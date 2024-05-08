@@ -14,7 +14,8 @@ class AdvisorEditProfile extends StatefulWidget {
 }
 
 class _AdvisorEditProfileState extends State<AdvisorEditProfile> {
-  
+  bool isProfileComplete = false;
+
   final _nameController = TextEditingController(); // where name is inputted
   final _schoolController = TextEditingController(); // where school is inputed
   final _majorController = TextEditingController(); // where major is inputted
@@ -50,9 +51,15 @@ class _AdvisorEditProfileState extends State<AdvisorEditProfile> {
         _skillsController.text = userProfile['skills'] ?? ''; // set the skills if it has been set before (i.e not empty in db)
         _bioController.text = userProfile['bio'] ?? ''; // set the bio if it has been set before
         
-      });
-    
+
+        isProfileComplete = _nameController.text.isNotEmpty &&
+          _schoolController.text.isNotEmpty &&
+          _majorController.text.isNotEmpty &&
+          _skillsController.text.isNotEmpty &&
+          _bioController.text.isNotEmpty;
+    });
   }
+
 
   // save changes to data
   void _saveEdits() async {
@@ -61,7 +68,20 @@ class _AdvisorEditProfileState extends State<AdvisorEditProfile> {
     String newMajor = _majorController.text.trim(); // the new major
     String newSkills = _skillsController.text.trim(); // the new skills
     String newBio = _bioController.text.trim(); // new bio
-                        
+
+
+     if (newName.isEmpty ||
+        newSchool.isEmpty ||
+        newMajor.isEmpty ||
+        newSkills.isEmpty ||
+        newBio.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Please fill out all required fields'),
+        duration: Duration(seconds: 1),
+      ));
+      return;
+    }
+
     await FirebaseFirestore.instance
     .collection('users')
     .doc(FirebaseAuth.instance.currentUser?.uid)
@@ -78,7 +98,10 @@ class _AdvisorEditProfileState extends State<AdvisorEditProfile> {
       content: Text('Profile updated successfully'),
       duration: Duration(seconds: 2),
     ));
-                        
+
+    setState(() {
+      isProfileComplete = true; // Mark profile as complete after saving edits
+    });
   }
 
   @override
@@ -177,6 +200,15 @@ class _AdvisorEditProfileState extends State<AdvisorEditProfile> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 3,
         onTap: (index) {
+
+          if (!isProfileComplete) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Please fill out your profile before accessing other tabs'),
+              duration: Duration(seconds: 2),
+            ));
+            return;
+          }
+
           // Handle bottom navigation bar taps
           if (index == 0) {
             // Navigate to Dashboard page
