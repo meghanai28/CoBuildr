@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
@@ -15,9 +16,9 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  bool showNotification = false; 
+  bool hasNewNotification = false; //variable to track unread notifications
   bool isProfileComplete = false;
-
+  
   final _nameController = TextEditingController(); // where name is inputted
   final _schoolController = TextEditingController(); // where school is inputed
   final _majorController = TextEditingController(); // where major is inputted
@@ -31,6 +32,7 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     _getAndSetUser(); // when we initalize we also want to intalize w the data of the user
+    _listenForNotifications(); 
   }
 
   // get/set the data of the user
@@ -133,7 +135,6 @@ class _EditProfileState extends State<EditProfile> {
                         },
                       ),
                     ),
-
                     Align(
                         alignment: Alignment.topLeft,
                         child: Stack(
@@ -142,9 +143,13 @@ class _EditProfileState extends State<EditProfile> {
                               icon: Icon(Icons.notifications), 
                               onPressed: () {
                                 _showNotificationsDialog(context); 
+                                setState(() {
+                                    hasNewNotification = false; 
+                                  }
+                                );
                               },
                             ),
-                          if(showNotification)
+                           if(hasNewNotification)
                             Positioned(
                               right: 0,
                               top: 0,
@@ -339,89 +344,43 @@ Widget _buildInputLabel(String labelText) {
     );
   }
 
-  void _handleNewNotification() {
-    setState(() {
-      showNotification = true; 
-    });
-  }
 
  Future<List<Map<String, dynamic>>> _fetchNotifications() async {
-  try {
-    String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('notifications')
-        .where('recipientId', isEqualTo: currentUserId)
-        .get(); // Query only notifications intended for the current user
-    List<Map<String, dynamic>> notifications = [];
-    querySnapshot.docs.forEach((doc) {
-      print('Notification data: ${doc.data()}');
-      notifications.add({
-        'message': doc['message'],
-        'read': doc['read'],
-        'recipientId': doc['recipientId'],
-        'timestamp': doc['timestamp'],
-      });
-    });
-    return notifications.isNotEmpty ? notifications : [];
-  } catch (e) {
-    print('Error fetching notifications: $e');
-    return [];
-  }
-}
+    final userId = FirebaseAuth.instance.currentUser?.uid?? ' ';
+    final QuerySnapshot<Map<String,dynamic>> snapshot = await FirebaseFirestore.instance
+      .collection('notifications')
+      .where('recipientId', isEqualTo: userId)
+      .orderBy('timestamp', descending: true)
+      .get(); 
 
-//   void _showNotificationsDialog(BuildContext context) {
-//   showDialog(
-//     context: context,
-//     builder: (BuildContext context) {
-//       Future<List<Map<String, dynamic>>> notificationsFuture = _fetchNotifications();
+      await _updateNotificationReadStatus(snapshot.docs); 
 
-//       return StatefulBuilder(
-//         builder: (context, setState) {
-//           return AlertDialog(
-//             title: Text('Notifications'),
-//             content: Container(
-//               width: double.maxFinite, // Ensure content takes up full width
-//               height: 200, // Specify a fixed height for the content area
-//               child: FutureBuilder(
-//                 future: notificationsFuture,
-//                 builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-//                   if (snapshot.connectionState == ConnectionState.waiting) {
-//                     return Center(child: CircularProgressIndicator());
-//                   } else if (snapshot.hasError) {
-//                     return Text('Error: ${snapshot.error}');
-//                   } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-//                     return Text('No notifications found.');
-//                   } else {
-//                     return SingleChildScrollView( // Use SingleChildScrollView for scrolling
-//                       child: SizedBox(
-//                         height: 180, // Adjust height to accommodate content
-//                         child: Column(
-//                           children: snapshot.data!.map((notification) {
-//                             return ListTile(
-//                               title: Text(notification['message'] ?? ''),
-//                             );
-//                           }).toList(),
-//                         ),
-//                       ),
-//                     );
-//                   }
-//                 },
-//               ),
-//             ),
-//             actions: <Widget>[
-//               TextButton(
-//                 onPressed: () {
-//                   Navigator.pop(context);
-//                 },
-//                 child: Text('Close'),
-//               ),
-//             ],
-//           );
-//         },
-//       );
-//     },
-//   );
+      return snapshot.docs.map((doc) => doc.data()).toList();
+ }
+//   try {
+//     String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+//     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+//         .collection('notifications')
+//         .where('recipientId', isEqualTo: currentUserId)
+//         .orderBy('timestamp', descending: true)
+//         .get(); // Query only notifications intended for the current user
+//     List<Map<String, dynamic>> notifications = [];
+//     querySnapshot.docs.forEach((doc) {
+//       print('Notification data: ${doc.data()}');
+//       notifications.add({
+//         'message': doc['message'],
+//         'read': doc['read'],
+//         'recipientId': doc['recipientId'],
+//         'timestamp': doc['timestamp'],
+//       });
+//     });
+//     return notifications.isNotEmpty ? notifications : [];
+//   } catch (e) {
+//     print('Error fetching notifications: $e');
+//     return [];
+//   }
 // }
+
 
   void _changePassword() async {
     
@@ -478,6 +437,7 @@ Widget _buildInputLabel(String labelText) {
 
 
 // Assuming this function is inside your StatefulWidget class
+
 void _showNotificationsDialog(BuildContext context) {
   showDialog(
     context: context,
@@ -502,13 +462,15 @@ void _showNotificationsDialog(BuildContext context) {
                   itemBuilder: (context, index) {
                     final notification = snapshot.data![index];
                     final timestamp = notification['timestamp'].toDate(); // converts firestore timestamp to datetime
-                    //final formattedTime = '${timestamp.hour}:${timestamp.minute}'; 
+                    final formattedTimestamp = DateFormat('h:mm a').format(timestamp); 
+                    final bool isRead = notification['read'] ?? false;  
+                    final Color circleColor = isRead ? Colors.grey : Colors.red; 
                     return Container(
                       margin: EdgeInsets.symmetric(vertical: 4.0), 
                       child: ListTile(
                         title: Text(notification['message'] ?? ''),
-                        subtitle: Text('${timestamp.hour}:${timestamp.minute}'),
-                        leading: Icon(Icons.notifications),
+                        subtitle: Text(formattedTimestamp),
+                        leading: Icon(Icons.circle, color: circleColor),
                       ),
                     );
                   },
@@ -530,6 +492,31 @@ void _showNotificationsDialog(BuildContext context) {
   );
 }
 
+  Future<void> _updateNotificationReadStatus(List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) async {
+    final List<Future<void>> updates = [];
+    for(final doc in docs) {
+      if(!(doc.data()['read'] ?? false)) {
+        updates.add(doc.reference.update({'read': true})); 
+      }
+    }
 
+  await Future.wait(updates); 
+  }
 
+  void updateHasNewNotification(bool value) {
+    setState(() {
+      hasNewNotification = value; 
+    });
+  }
+
+  void _listenForNotifications() {
+    _fetchNotifications().then((notifications) {
+      final hasUnreadNotifications = notifications.any((notification) => !notification['read']); 
+      setState(() {
+        hasNewNotification = hasUnreadNotifications; 
+      }); 
+    }); 
+  }
+
+  
 }
