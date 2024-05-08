@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:namer_app/services/chat_service.dart';
+import 'package:intl/intl.dart';
 
 class ChatDetails extends StatefulWidget {
   final String recieverUserEmail; //get recieverUserEmail
@@ -125,6 +126,11 @@ class _ChatDetailsState extends State<ChatDetails> {
           Text(
             data['senderEmail'], // the email
             style: TextStyle(color: Colors.black), // black
+          ),
+          SizedBox(height: 1.0),
+          Text(
+            DateFormat.yMd().add_jm().format(data['timestamp'].toDate()),
+            style: TextStyle(color: Colors.black, fontSize: 10), // black
           ),
         ],
       ),

@@ -21,6 +21,7 @@ dependencies:
   image_picker:
   firebase_storage:
   file_picker:
+  intl:
 
 
 dev_dependencies:

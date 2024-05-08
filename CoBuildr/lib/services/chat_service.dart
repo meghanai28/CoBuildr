@@ -30,9 +30,15 @@ class ChatService extends ChangeNotifier{
     ids.sort();
     String chatRoomId = ids.join("_");
 
-    await _fireStore.collection('chat_rooms').doc(chatRoomId).collection('messages').add(newMessage.toMap());
+    
 
+    await _fireStore.collection('chat_rooms').doc(chatRoomId).collection('messages').add(newMessage.toMap());
+    await _fireStore.collection('chat_rooms').doc(chatRoomId).set({
+    'chatTimestamp': timestamp, 
+    });
     // add new message to database
+
+    
   }
 
   // get message
@@ -64,6 +70,23 @@ class ChatService extends ChangeNotifier{
         .get(); // query all the messages
 
     return querySnapshot.docs.isNotEmpty; // determine if its true or false (our Future)
+  }
+
+  Future<Map<String, dynamic>> getRecentMessage(String userId) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final recentMessage = querySnapshot.docs.first.data();
+      return {
+        'message': recentMessage['message'],
+        'timestamp': recentMessage['timestamp'],
+      };
+    }
+    return {}; 
   }
 
 
