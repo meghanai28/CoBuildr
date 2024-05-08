@@ -96,8 +96,9 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
             final projectData = projects[index].data()! as Map<String, dynamic>; // get each project data
             final advisors = projectData['advisors'];
             final projectId = projects[index].id;
+            final active = projectData['advisorActive'];
             
-            if(advisors != null && advisors.contains(_auth.currentUser!.uid))
+            if(advisors != null && advisors.contains(_auth.currentUser!.uid) && active )
             {
               return ListTile(
                title: _buildProjectTile(projectData['title'], 'Currently Advising',projectId), // the title of the list will be the project name
