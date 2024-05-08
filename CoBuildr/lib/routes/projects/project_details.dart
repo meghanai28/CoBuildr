@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:namer_app/routes/projects/request_advisor.dart';
 import 'package:namer_app/services/chat_service.dart';
+import 'package:namer_app/routes/editProfile/editProfile_page.dart';
 
 class ProjectDetails extends StatefulWidget {
   
@@ -22,7 +23,6 @@ class ProjectDetails extends StatefulWidget {
 }
 
 class _ProjectDetailsState extends State<ProjectDetails> {
-  bool showNotification = false; 
 
   final TextEditingController _titleController = TextEditingController(); // title controller
   final TextEditingController _filtersController = TextEditingController(); // tags controller
@@ -34,7 +34,6 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   void initState() {
     super.initState();
     _getAndSetProject(); // when we initalize we also want to intalize w the data of the project
-    //_checkUnreadNotifications(); 
   }
 
   // get/set the data of the project
@@ -695,7 +694,7 @@ void _acceptRequest(String userId, Map<String, dynamic> projectData) async {
     SnackBar(content: Text('Request accepted')), // confirm
   );
 
-  await _sendNotification(userId, 'You have been accepted into the project team.', widget.projectId); 
+    await _sendNotification(userId, '', widget.projectId, isAccepted : true); //sends a notfication if you're accepted into project 
 
   setState(() {}); // refresh the container after ever change
 
@@ -714,6 +713,8 @@ void _declineRequest(String userId, Map<String, dynamic> projectData) async {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(content: Text('Request declined')), // confirm
   );
+  
+  await _sendNotification(userId, '', widget.projectId, isAccepted : false); //sends a notfication if you're not accepted into project
 
   setState(() {}); // refresh the container after ever change
 
@@ -876,7 +877,7 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
     }).toList();
   } 
 
-  Future<void> _sendNotification(String userId, String message, String projectId) async { 
+  Future<void> _sendNotification(String userId, String message, String projectId, {bool isAccepted = true}) async { 
     DocumentSnapshot projectSnapshot = await FirebaseFirestore.instance
       .collection('published_projects')
       .doc(projectId)
@@ -884,10 +885,17 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
 
       if(projectSnapshot.exists) {
         String projectTitle = projectSnapshot.get('title'); 
+
+        if(isAccepted) { //logic for checking if the user was accepted into the project
+          message = 'You have been accepted into $projectTitle';  
+          
+        } else {
+          message = 'Your request to join $projectTitle has been denied'; 
+        }
       
         Map<String, dynamic> notificationData = { //constructs a notification document
           'recipientId': userId, 
-          'message': 'You have been accepted into $projectTitle', // Include the project title in the message
+          'message': message, // Include the project title in the message
           'projectId': projectId,
           'timestamp': DateTime.now(),
           'read': false, // Mark notification as unread 
