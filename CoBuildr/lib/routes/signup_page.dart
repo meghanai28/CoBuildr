@@ -134,8 +134,12 @@ class _SignupPageState extends State<SignupPage> {
       // save this information into the user database
       await _firestore.collection('users').doc(userCredential.user!.uid).set(newUser.toMap());
 
-      // redirect to log-in page after sign-up
-      Navigator.pushReplacementNamed(context, '/login');
+      // Redirect based on user type
+      if (_selectedUserType == 'Student') {
+        Navigator.pushReplacementNamed(context, '/editProfile');
+      } else if (_selectedUserType == 'Advisor') {
+        Navigator.pushReplacementNamed(context, '/advisor/advisor_setting');
+      }
 
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

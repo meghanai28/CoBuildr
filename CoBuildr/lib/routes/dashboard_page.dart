@@ -72,10 +72,8 @@ class _DashboardPageState extends State<DashboardPage> {
       });
     }
 
-    // Implement logic to add user as a teammate to the project
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Liked project with ID: $projectId')),
-    );
+      SnackBar(content: Text('Liked Project ${currentProject['title']}'), duration: Duration(seconds: 1)),);
     _handleDislike(); // Move to the next project
   }
 
@@ -111,15 +109,21 @@ class _DashboardPageState extends State<DashboardPage> {
                           _handleLike(); // Changed to handle like on right swipe
                         }
                       },
-                      background: Container(
-                        color: Colors.green, // Changed color to green for like
-                        alignment: Alignment.centerLeft,
-                        child: Icon(Icons.check, color: Colors.white, size: 40.0),
+                      background: Card(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                        color: Colors.green,
+                        child: Container(
+                          alignment: Alignment.centerLeft, // Align contents to the center right
+                          child: Icon(Icons.check, color: Colors.white, size: 40.0),
+                        )
                       ),
-                      secondaryBackground: Container(
+                      secondaryBackground: Card(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
                         color: Colors.red, // Changed color to red for dislike
-                        alignment: Alignment.centerRight,
-                        child: Icon(Icons.close, color: Colors.white, size: 40.0),
+                        child: Container(
+                          alignment: Alignment.centerRight, // Align contents to the center right
+                          child: Icon(Icons.close, color: Colors.white, size: 40.0),
+                        )
                       ),
                       child: Card(
                         shape: RoundedRectangleBorder(
