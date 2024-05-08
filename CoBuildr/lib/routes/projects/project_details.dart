@@ -498,7 +498,7 @@ Widget build(BuildContext context) {
   );
 }
 
-  // popup dialog for creating a new chat
+  // popup dialog for deleting
   void _deleteDialog(BuildContext context) {
 
     showDialog( // show Dialog method helps us do a popup on creen
