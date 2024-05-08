@@ -169,6 +169,7 @@ class _EditProfileState extends State<EditProfile> {
                           Text('Email: $_email'), // email
                           const SizedBox(height: 9.0), // 19-10 = 9!
                           Text('User Type: $_userType'), // user type
+                          const SizedBox(height: 9.0), // 19-10 = 9!
                           ElevatedButton(
                             onPressed: () {
                               _changePassword(); // Call method to change password
