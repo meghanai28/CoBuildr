@@ -16,19 +16,25 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Projects'),
+  title: Center(
+    child: Text(
+      'Your Projects',
+      style: TextStyle(color: Colors.purple), // Making text purple
+    ),
+  ),
         automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Currently Advising',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
+  padding: const EdgeInsets.all(8.0),
+  child: Text(
+    'Currently Advising',
+    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.purple), // Making text purple
+  ),
+),
+
           Expanded(
             child: _buildProjectList(),
           ),

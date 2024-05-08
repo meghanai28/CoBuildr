@@ -9,10 +9,10 @@ class AdvisorChatPage extends StatefulWidget {
   const AdvisorChatPage({Key? key}) : super(key: key);
 
   @override
-  State<AdvisorChatPage> createState() => _ChatPageState(); // create the state
+  State<AdvisorChatPage> createState() => _AdvisorChatPageState(); // create the state
 }
 
-class _ChatPageState extends State<AdvisorChatPage> {
+class _AdvisorChatPageState extends State<AdvisorChatPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance; // create instance of authentication to be used to get current user
 
   @override
@@ -20,7 +20,14 @@ class _ChatPageState extends State<AdvisorChatPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
-        title: const Text('Chat Page'), // name of the page
+        title: Center(
+          child: Text(
+            'Messages',
+            style: TextStyle(
+              color: const Color.fromARGB(255, 111, 15, 128), 
+            ),
+          ),
+        ), // name of the page
       ),
 
       body: Column( // show the list of the users that the current user has messages with
@@ -32,11 +39,10 @@ class _ChatPageState extends State<AdvisorChatPage> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromARGB(255, 219, 110, 255),
+        backgroundColor: Color.fromARGB(255, 111, 15, 128),
         onPressed: () {
           _createNewChatDialog(context);
         },
-        mini: true, // mini smaller
         child: Icon(Icons.add, color: Colors.white),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -47,15 +53,16 @@ class _ChatPageState extends State<AdvisorChatPage> {
             // Navigate to Dashboard page
             Navigator.pushNamed(context, '/advisor/advisor_dashboard');
           } else if (index == 1) {
-            // Navigate to Project Tab
+            // Navigate to Your Projects page
             Navigator.pushNamed(context, '/advisor/project_tab');
           } else if (index == 3) {
+            // Navigate to Settings page
             Navigator.pushNamed(context, '/advisor/advisor_setting');
           }
         },
         items: [
           _buildNavItem(Icons.dashboard, 'Dashboard'),
-          _buildNavItem(Icons.list, 'Your Projects'),
+          _buildNavItem(Icons.list, 'Projects'),
           _buildNavItem(Icons.message, 'Messages'),
           _buildNavItem(Icons.settings, 'Settings'),
         ],
@@ -64,7 +71,7 @@ class _ChatPageState extends State<AdvisorChatPage> {
     );
   }
 
-      // build list of users that user is currently chatting with
+  // build list of users that user is currently chatting with
   Widget _buildUserList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding
