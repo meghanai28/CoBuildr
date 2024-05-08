@@ -144,7 +144,7 @@ class _EditProfileState extends State<EditProfile> {
                               onPressed: () {
                                 _showNotificationsDialog(context); 
                                 setState(() {
-                                   hasNewNotification = false; 
+                                    hasNewNotification = false; 
                                   }
                                 );
                               },
@@ -331,11 +331,6 @@ Widget _buildInputLabel(String labelText) {
     );
   }
 
-  // void _handleNewNotification() {
-  //   setState(() {
-  //     showNotification = true; 
-  //   });
-  // }
 
  Future<List<Map<String, dynamic>>> _fetchNotifications() async {
     final userId = FirebaseAuth.instance.currentUser?.uid?? ' ';
