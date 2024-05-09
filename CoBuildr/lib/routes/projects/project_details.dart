@@ -877,7 +877,7 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
     }).toList();
   } 
 
-  Future<void> _sendNotification(String userId, String message, String projectId, {bool isAccepted = true}) async { 
+  Future<void> _sendNotification(String userId, String message, String projectId, {bool isAccepted = true}) async { // Sends notifications to users for project acceptance
     DocumentSnapshot projectSnapshot = await FirebaseFirestore.instance
       .collection('published_projects')
       .doc(projectId)
@@ -886,37 +886,26 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
       if(projectSnapshot.exists) {
         String projectTitle = projectSnapshot.get('title'); 
 
-        if(isAccepted) { //logic for checking if the user was accepted into the project
-          message = 'You have been accepted into $projectTitle';  
+        if(isAccepted) { // Logic for checking if the user was accepted into the project
+          message = 'You have been accepted into $projectTitle';  // User accepted into project 
           
         } else {
-          message = 'Your request to join $projectTitle has been denied'; 
+          message = 'Your request to join $projectTitle has been denied'; // User's request was declined 
         }
       
-        Map<String, dynamic> notificationData = { //constructs a notification document
+        Map<String, dynamic> notificationData = { // Constructs a notification document
           'recipientId': userId, 
-          'message': message, // Include the project title in the message
+          'message': message, 
           'projectId': projectId,
           'timestamp': DateTime.now(),
-          'read': false, // Mark notification as unread 
+          'read': false, // Marks notification as unread 
         }; 
 
-        await FirebaseFirestore.instance.collection('notifications').add(notificationData);  //add notification document to Firestore
+        await FirebaseFirestore.instance.collection('notifications').add(notificationData);  // Adds notification document to Firestore
       } else {
         print('Project with ID $projectId does not exist'); 
       }
     
   }
 
-  // Future<void> _checkUnreadNotifications() async {
-  //   QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-  //     .collection('notifications')
-  //     .where('recipientId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-  //     .where('read', isEqualTo: false)
-  //     .get(); 
-
-  //     setState(() {
-  //       showNotification = snapshot.docs.isNotEmpty; 
-  //     });
-  // }
 }
