@@ -118,10 +118,10 @@ class _SignupPageState extends State<SignupPage> {
         email: email, password: password
       ); //create user credential
 
-      await userCredential.user!.sendEmailVerification();
+      //await userCredential.user!.sendEmailVerification();
 
       setState(() {
-        _message = 'Account created successfully. Verification email sent.';
+        _message = 'Account created successfully.';
       });
 
       UserProfile newUser = UserProfile (
