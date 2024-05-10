@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+//Scoll behavior class to handle scrolling in the app
 class CustomScrollBehavior extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
@@ -12,18 +13,23 @@ class CustomScrollBehavior extends ScrollBehavior {
   }
 }
 
+//StatefulWidget for create project page
 class CreateProjectPage extends StatefulWidget {
   @override
   _CreateProjectPageState createState() => _CreateProjectPageState();
 }
 
+
 class _CreateProjectPageState extends State<CreateProjectPage> {
+  // Controllers for text fields and scrolling behavior
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _filtersController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  // Function to publish a project (either as a draft or final)
   void publishProject(BuildContext context, bool isDraft, User user) async {
+    //Checks if all fields are filled
     if (_titleController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
         _filtersController.text.isEmpty) {
@@ -33,6 +39,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
       return;
     }
 
+
+  // Saves the project data to the database using what the user typed in the text fields 
     try {
       final projectData = {
         'title': _titleController.text,
@@ -46,19 +54,21 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
       };
 
       if (!isDraft) {
-        // Publish project
+        // Publish project to the database
         await FirebaseFirestore.instance.collection('published_projects').add(projectData);
       } else {
-        // Save project to drafts
+        // Save project to drafts in the database
         await FirebaseFirestore.instance.collection('draft_projects').add(projectData);
       }
 
+      // Success message and navigates to the Projects page
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Project ${isDraft ? 'saved' : 'published'} successfully')),
       );
       
       Navigator.pushNamed(context, '/yourProjects');
     } catch (e) {
+      // Show error message if app fails to publish/save project
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error ${isDraft ? 'saving' : 'publishing'} project')),
       );
@@ -67,6 +77,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Gets the current user
     final User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       // Handle case where user is not logged in
@@ -76,9 +87,9 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
         ),
       );
     }
-
     return Scaffold(
       appBar: AppBar(
+        //App bar title and styling
         title: Center(
           child: Text(
             'Create Project',
@@ -87,8 +98,9 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
             ),
           ),
         ),
-        automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
+        automaticallyImplyLeading: false, 
       ),
+      // Styling for the page 
       body: ScrollConfiguration(
         behavior: CustomScrollBehavior(),
         child: SingleChildScrollView(
@@ -98,6 +110,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
+                // Text field for Project Title
                 'Project Title',
                 style: TextStyle(
                   color: const Color.fromARGB(255, 111, 15, 128),
@@ -107,6 +120,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                 controller: _titleController,
               ),
               SizedBox(height: 20.0),
+              
+              // Text field for project tags
               Text(
                 'Project Tags (comma-separated)',
                 style: TextStyle(
@@ -116,13 +131,16 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
               TextFormField(
                 controller: _filtersController,
               ),
-              SizedBox(height: 20.0),
+              SizedBox(height: 20.0), 
+
+              // Text field for Project Description
               Text(
                 'Description',
                 style: TextStyle(
                   color: const Color.fromARGB(255, 111, 15, 128), 
                 ),
               ),
+              // Description field to be able to scroll if description is long
               SizedBox(
                 height: 150, 
                 child: Scrollbar(
@@ -137,9 +155,11 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                 ),
               ),
               SizedBox(height: 20.0),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  // Button to save project as a draft
                   ElevatedButton(
                     onPressed: () => publishProject(context, true, user), // Save as draft
                     style: ElevatedButton.styleFrom(
@@ -149,6 +169,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     ),
                     child: Text('Save'),
                   ),
+
+                  // Button to publish project
                   ElevatedButton(
                     onPressed: () => publishProject(context, false, user), // Publish
                     style: ElevatedButton.styleFrom(
@@ -164,24 +186,24 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
           ),
         ),
       ),
+
+      // Navigation bar shown at the bottom of page
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,
         onTap: (index) {
-          // Handle bottom navigation bar taps
+          // Navigate to other tabs/pages using the navigation bar
           if (index == 0) {
-            // Navigate to Dashboard page
             Navigator.pushNamed(context, '/dashboard');
           } else if (index == 2) {
-            // Navigate to Your Projects page
             Navigator.pushNamed(context, '/yourProjects');
           } else if (index == 3) {
-            // Navigate to Messages page
             Navigator.pushNamed(context, '/chat');
           } else if (index == 4) {
-            // Navigate to Settings page
             Navigator.pushNamed(context, '/editProfile');
           }
         },
+        
+        //Builds the icons and labels shown at the bottom navigation bar
         items: [
           _buildNavItem(Icons.dashboard, 'Dashboard'),
           _buildNavItem(Icons.add, 'Create'),
@@ -194,6 +216,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     );
   }
 
+  //Builds the navigation icons and items for the nav bar
   BottomNavigationBarItem _buildNavItem(IconData icon, String label) {
     return BottomNavigationBarItem(
       icon: Icon(

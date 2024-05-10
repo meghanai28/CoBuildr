@@ -141,7 +141,7 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
 
     Widget _buildProjectTile(String projectName, String projectDescription, String projectId) {
     return ListTile(
-      leading: _buildSquare(), // Add light purple square
+      leading: _buildLightBulb(), // Add lightbulb
       title: Text(
         projectName,
         style: TextStyle(fontWeight: FontWeight.bold), // Make "Project" bold
@@ -167,11 +167,10 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
   }
 
 
-  Widget _buildSquare() {
-    return Container(
-      width: 50,
-      height: 50,
-      color: Colors.purple[200],
+  Widget _buildLightBulb() {
+    return Icon(
+      Icons.lightbulb, // Lightbulb icon
+      color: Colors.yellow, // Set lightbulb color
     );
   }
 }
