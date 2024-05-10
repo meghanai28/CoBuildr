@@ -99,7 +99,7 @@ class _EditProfileState extends State<EditProfile> {
     ));
 
     setState(() {
-      isProfileComplete = true; // Mark profile as complete after saving edits
+      isProfileComplete = true; // mark profile as complete after saving edits
     });
   }
   @override
