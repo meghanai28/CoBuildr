@@ -47,12 +47,12 @@ class _RequestAdvisorPageState extends State<RequestAdvisorPage> {
                       children: [
                         GestureDetector(
                           onTap: () async {
-                            _showProfile(context, userProfile); // Call _showProfile on eye icon tap
+                            _showProfile(context, userProfile); // _showProfile when the button is clicked
                           },
                           child: Icon(Icons.remove_red_eye),
                         ),
                         SizedBox(width: 10),
-                        Text(userProfile['email']),
+                        Text(userProfile['email']), // show the email
                       ],
                     ),
                   subtitle: Text(userProfile['name'] ?? ''),
@@ -64,7 +64,7 @@ class _RequestAdvisorPageState extends State<RequestAdvisorPage> {
                     child: Text('Request'),
                   ): Text('Rejected'),
                   onTap: () {
-                    _showProfile(context, userProfile);
+                    _showProfile(context, userProfile); // in some cases make sure that advisor who already requested is not allowed
                   },
                 );
               },
