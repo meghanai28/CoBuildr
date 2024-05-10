@@ -129,9 +129,9 @@ class _EditProfileState extends State<EditProfile> {
                     Align( // aligned to the right
                       alignment: Alignment.topRight,
                       child: IconButton(
-                        icon: Icon(Icons.logout), // logout button
+                        icon: Icon(Icons.logout), // Logout button
                         onPressed: () {
-                          Navigator.pushNamed(context, '/welcome'); // navigate to the login button
+                          Navigator.pushNamed(context, '/welcome'); // Navigates to the login button
                         },
                       ),
                     ),
@@ -139,17 +139,17 @@ class _EditProfileState extends State<EditProfile> {
                         alignment: Alignment.topLeft,
                         child: Stack(
                           children: [
-                            IconButton(
-                              icon: Icon(Icons.notifications), 
+                            IconButton( // Creates notifications button 
+                              icon: Icon(Icons.notifications),  
                               onPressed: () {
-                                _showNotificationsDialog(context); 
+                                _showNotificationsDialog(context); // Calls function that shows notifications list 
                                 setState(() {
                                     hasNewNotification = false; 
                                   }
                                 );
                               },
                             ),
-                           if(hasNewNotification)
+                           if(hasNewNotification) // Adds indicator to notification button if there's a new notification
                             Positioned(
                               right: 0,
                               top: 0,
@@ -166,8 +166,8 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                     ),
 
-                    Center( // aligned to the center
-                      child: Column( // create a vertical column
+                    Center( // Aligned to the center
+                      child: Column( //Create a vertical column
                         children: [
                           _createPFP(), // pfp created
                           const SizedBox(height: 10), // pfp needs 19 space (my age!)
@@ -345,7 +345,7 @@ Widget _buildInputLabel(String labelText) {
   }
 
 
- Future<List<Map<String, dynamic>>> _fetchNotifications() async {
+ Future<List<Map<String, dynamic>>> _fetchNotifications() async { // Fetches notifications from firebase based on the user's ID
     final userId = FirebaseAuth.instance.currentUser?.uid?? ' ';
     final QuerySnapshot<Map<String,dynamic>> snapshot = await FirebaseFirestore.instance
       .collection('notifications')
@@ -357,30 +357,6 @@ Widget _buildInputLabel(String labelText) {
 
       return snapshot.docs.map((doc) => doc.data()).toList();
  }
-//   try {
-//     String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
-//     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-//         .collection('notifications')
-//         .where('recipientId', isEqualTo: currentUserId)
-//         .orderBy('timestamp', descending: true)
-//         .get(); // Query only notifications intended for the current user
-//     List<Map<String, dynamic>> notifications = [];
-//     querySnapshot.docs.forEach((doc) {
-//       print('Notification data: ${doc.data()}');
-//       notifications.add({
-//         'message': doc['message'],
-//         'read': doc['read'],
-//         'recipientId': doc['recipientId'],
-//         'timestamp': doc['timestamp'],
-//       });
-//     });
-//     return notifications.isNotEmpty ? notifications : [];
-//   } catch (e) {
-//     print('Error fetching notifications: $e');
-//     return [];
-//   }
-// }
-
 
   void _changePassword() async {
     
@@ -436,9 +412,8 @@ Widget _buildInputLabel(String labelText) {
   }
 
 
-// Assuming this function is inside your StatefulWidget class
 
-void _showNotificationsDialog(BuildContext context) {
+void _showNotificationsDialog(BuildContext context) { //Function that creates the notifications list UI dialog
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -453,18 +428,18 @@ void _showNotificationsDialog(BuildContext context) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                return Text('Error: ${snapshot.error}'); // If there's an error show error 
+              } else if (snapshot.data == null || snapshot.data!.isEmpty) { // If no notifications are present 
                 return Text('No notifications found.');
               } else {
                 return ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     final notification = snapshot.data![index];
-                    final timestamp = notification['timestamp'].toDate(); // converts firestore timestamp to datetime
-                    final formattedTimestamp = DateFormat('h:mm a').format(timestamp); 
+                    final timestamp = notification['timestamp'].toDate(); // Converts firestore timestamp to datetime
+                    final formattedTimestamp = DateFormat('h:mm a').format(timestamp); // Converts the timestamp into HH:MM AM/PM time
                     final bool isRead = notification['read'] ?? false;  
-                    final Color circleColor = isRead ? Colors.grey : Colors.red; 
+                    final Color circleColor = isRead ? Colors.grey : Colors.red; // Indicates if the message has been read yet
                     return Container(
                       margin: EdgeInsets.symmetric(vertical: 4.0), 
                       child: ListTile(
@@ -492,7 +467,7 @@ void _showNotificationsDialog(BuildContext context) {
   );
 }
 
-  Future<void> _updateNotificationReadStatus(List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) async {
+  Future<void> _updateNotificationReadStatus(List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) async { // Updates if a notification has been read 
     final List<Future<void>> updates = [];
     for(final doc in docs) {
       if(!(doc.data()['read'] ?? false)) {
@@ -503,13 +478,7 @@ void _showNotificationsDialog(BuildContext context) {
   await Future.wait(updates); 
   }
 
-  void updateHasNewNotification(bool value) {
-    setState(() {
-      hasNewNotification = value; 
-    });
-  }
-
-  void _listenForNotifications() {
+  void _listenForNotifications() { // Listeners for notifications from project_details class logic to see if an new notfification has been added
     _fetchNotifications().then((notifications) {
       final hasUnreadNotifications = notifications.any((notification) => !notification['read']); 
       setState(() {
