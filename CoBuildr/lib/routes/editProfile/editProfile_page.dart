@@ -177,14 +177,14 @@ class _EditProfileState extends State<EditProfile> {
                           const SizedBox(height: 9.0), // 19-10 = 9!
                           ElevatedButton(
                             onPressed: () {
-                              _changePassword(); // Call method to change password
+                              _changePassword(); // change password button
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white, // Change button color as desired
+                              backgroundColor: Colors.white, // style the button
                             ),
                             child: Text(
                               'Change Password',
-                              style: TextStyle(color: Colors.purple),
+                              style: TextStyle(color: Colors.purple), // style the color of text button
                            ),
                           ),
                         ],
@@ -277,23 +277,23 @@ class _EditProfileState extends State<EditProfile> {
           if (!isProfileComplete) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text('Please fill out your profile before accessing other tabs'),
-              duration: Duration(seconds: 1),
+              duration: Duration(seconds: 1), 
             ));
             return;
           }
 
-          // Handle bottom navigation bar taps
+          // nav bar
           if (index == 0) {
-            // Navigate to Dashboard page
+            // dashboard page
             Navigator.pushNamed(context, '/dashboard');
           } else if (index == 1) {
-            // Navigate to Create Project page
+            // create project page
             Navigator.pushNamed(context, '/createProject');
           } else if (index == 2) {
-            // Navigate to Your Projects page
+            // projects page
             Navigator.pushNamed(context, '/yourProjects');
           } else if (index == 3) {
-            // Navigate to Settings page
+            // settings page
             Navigator.pushNamed(context, '/chat');
           }
         },
@@ -304,7 +304,7 @@ class _EditProfileState extends State<EditProfile> {
           _buildNavItem(Icons.message, 'Messages'),
           _buildNavItem(Icons.settings, 'Settings'),
         ],
-        type: BottomNavigationBarType.fixed,
+        type: BottomNavigationBarType.fixed, // make sure its fixed
       ),
     );
   }

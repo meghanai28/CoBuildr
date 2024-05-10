@@ -13,9 +13,9 @@ class WelcomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset(
-                'assets/images/logo.png', // Path to your logo image
-                width: 200, // Adjust width as needed
-                height: 200, // Adjust height as needed
+                'assets/images/logo.png', // path for the logo
+                width: 200, // width
+                height: 200, // height
               ),
               SizedBox(height: 20.0),
               Text(
@@ -27,11 +27,11 @@ class WelcomePage extends StatelessWidget {
               ),
               SizedBox(height: 40.0),
               SizedBox(
-                width: 200.0, // Set the button width
-                height: 50.0, // Set the button height
+                width: 200.0, // the button should be proper
+                height: 50.0, 
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/login');
+                    Navigator.pushNamed(context, '/login'); // show the login
                   },
                   child: Text(
                     'Login',
@@ -43,11 +43,11 @@ class WelcomePage extends StatelessWidget {
               ),
               SizedBox(height: 20.0),
               SizedBox(
-                width: 200.0, // Set the button width
-                height: 50.0, // Set the button height
+                width: 200.0, // set the button
+                height: 50.0, // set the button
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/signup');
+                    Navigator.pushNamed(context, '/signup'); // signup
                   },
                   child: Text(
                     'Sign Up',

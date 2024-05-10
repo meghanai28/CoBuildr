@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class RequestAdvisorPage extends StatefulWidget {
   final String projectId;
-  final Function reloadRequestedContainer; // Define the reloadRequestedContainer function as a parameter
+  final Function reloadRequestedContainer; // function reloadRequestedContainer function as a parameter, so the moment someone is requested the reload occurs, and avoids bugs
 
   const RequestAdvisorPage({Key? key, required this.projectId, required this.reloadRequestedContainer}) : super(key: key);
 
@@ -24,12 +24,12 @@ class _RequestAdvisorPageState extends State<RequestAdvisorPage> {
         future: FirebaseFirestore.instance
             .collection('users')
             .where('userType', isEqualTo: 'Advisor')
-            .get(),
+            .get(), // get all advisors
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: Text ("")); // show empty text 
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}')); // show error
           } else {
             final advisors = snapshot.data!.docs;
             return ListView.builder(
@@ -80,7 +80,7 @@ class _RequestAdvisorPageState extends State<RequestAdvisorPage> {
     
     print("Requesting advisor...");
 
-    // Add advisor to the project's advisors list
+    // add advsior project's advisors list
     await FirebaseFirestore.instance
         .collection('published_projects')
         .doc(projectId)
@@ -88,7 +88,7 @@ class _RequestAdvisorPageState extends State<RequestAdvisorPage> {
       'advisors': FieldValue.arrayUnion([advisorId]),
     });
 
-    // Add projectId to the advisor's advisorRequests list
+    // add projectId to the advisor
     await FirebaseFirestore.instance
         .collection('users')
         .doc(advisorId)
@@ -96,9 +96,9 @@ class _RequestAdvisorPageState extends State<RequestAdvisorPage> {
       'advisorRequests': FieldValue.arrayUnion([projectId]),
     });
 
-    widget.reloadRequestedContainer();
+    widget.reloadRequestedContainer(); // reload the container
 
-    print("Advisor requested successfully.");
+    print("Advisor requested successfully."); // print + debug statement
   
   } 
 

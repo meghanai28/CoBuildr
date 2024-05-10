@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacementNamed(context, '/dashboard');
         } 
         else if (userType == 'Advisor') {
-          Navigator.pushReplacementNamed(context, '/advisor/advisor_dashboard'); // Corrected route
+          Navigator.pushReplacementNamed(context, '/advisor/advisor_dashboard'); // proper route
         }
       //} else {
       

@@ -129,7 +129,7 @@ class _ChatDetailsState extends State<ChatDetails> {
           ),
           SizedBox(height: 1.0),
           Text(
-            DateFormat.yMd().add_jm().format(data['timestamp'].toDate()),
+            DateFormat.yMd().add_jm().format(data['timestamp'].toDate()), // show time stamp under each message
             style: TextStyle(color: Colors.black, fontSize: 10), // black
           ),
         ],

@@ -78,7 +78,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   }
 
   void reloadContainer() {
-    setState(() {
+    setState(() { // reload so that it shows up when needed
     });
   }
 
@@ -88,20 +88,20 @@ class _ProjectDetailsState extends State<ProjectDetails> {
       future: _getProjectData(), // get the project data
       builder: (context, projectSnapshot) {
         if (projectSnapshot.connectionState == ConnectionState.waiting) {
-        return Text(""); 
+        return Text("");  // reload show empty text
         } 
 
         else if (projectSnapshot.hasError) {
-          return Text('Error: ${projectSnapshot.error}');
+          return Text('Error: ${projectSnapshot.error}'); // in case of error
         }
 
-        var projectProfile = projectSnapshot.data!.data() as Map<String, dynamic>;
-        final advisors = projectProfile['advisors'];
-        final active = projectProfile['advisorActive'];
-        if (advisors.length == 0) {
-          if(widget.owner)
+        var projectProfile = projectSnapshot.data!.data() as Map<String, dynamic>; // save as a map
+        final advisors = projectProfile['advisors']; // get the advsiors
+        final active = projectProfile['advisorActive']; // check if the advsior is active
+        if (advisors.length == 0) { // if its 0 there is no advsior
+          if(widget.owner) // check if its the owner
           {
-            return ElevatedButton(
+            return ElevatedButton( // show a button to request for an advisor
               onPressed: () {
                 Navigator.push(
                   context,
@@ -112,14 +112,14 @@ class _ProjectDetailsState extends State<ProjectDetails> {
               ) ;
               },
               style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 151, 36, 171)
+                    backgroundColor: Color.fromARGB(255, 151, 36, 171) // style
                     ),
-                  child: Text('Request Advisor', style: TextStyle(color: Colors.white)),
+                  child: Text('Request Advisor', style: TextStyle(color: Colors.white)), // style
             );
           }
           else{
             return Text('No current advisor', style: TextStyle(fontWeight: FontWeight.bold, 
-                        color: const Color.fromARGB(255, 111, 15, 128),));
+                        color: const Color.fromARGB(255, 111, 15, 128),)); // give a specific color for the text
           }
         } 
         else {
@@ -127,33 +127,33 @@ class _ProjectDetailsState extends State<ProjectDetails> {
               future: _getUserData(advisors[0]), // get user data for advisor requested
               builder: (context, userSnapshot) {
               if (userSnapshot.connectionState == ConnectionState.waiting) {
-                return Text(""); 
+                return Text("");  // show empty text
               } 
               else if (userSnapshot.hasError) {
-                return Text('Error: ${userSnapshot.error}');
+                return Text('Error: ${userSnapshot.error}'); // show error if it happened
               } 
               else {
-                var userProfile = userSnapshot.data!.data() as Map<String, dynamic>;
+                var userProfile = userSnapshot.data!.data() as Map<String, dynamic>; // get user data
                 return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start, // align
                   children: [
                       Text(active ? "Current Advisor:" : "Request Advisor (waiting for response):", style: TextStyle(fontWeight: FontWeight.bold, 
-                        color: const Color.fromARGB(255, 111, 15, 128),)),
-                      ListTile(
+                        color: const Color.fromARGB(255, 111, 15, 128),)), // conditional of what text should show up
+                      ListTile( // the list title for what needs to be shown
                         title: Row(
                           children: [
                             GestureDetector(
                               onTap: () async {
-                                _showProfile(context, userProfile); // Call _showProfile on eye icon tap
+                                _showProfile(context, userProfile); // allow an eye icon
                               },
-                              child: Icon(Icons.remove_red_eye),
+                              child: Icon(Icons.remove_red_eye), // click on it when needed
                             ),
                             SizedBox(width: 10),
-                            Text(userProfile['email']),
+                            Text(userProfile['email']), // show the email
                           ],
                         ),
                         onTap: () {
-                          _showProfile(context, userProfile);
+                          _showProfile(context, userProfile); // show the profile when clicked
                         }
                       ),
                     ],
@@ -542,12 +542,12 @@ Widget _buildTeammatesList() {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Text('');
           } else {
-            final projectData = snapshot.data!.data()! as Map<String, dynamic>;
-            final teammates = projectData['teammates'] as List<dynamic>;
+            final projectData = snapshot.data!.data()! as Map<String, dynamic>; // get map of all the project data
+            final teammates = projectData['teammates'] as List<dynamic>; // creat e alist of all the teamates
 
-            return ListView.separated( // Using ListView.separated to add dividers
+            return ListView.separated( //add divdiers
               itemCount: teammates.length,
-              separatorBuilder: (context, index) => Divider(), // Divider between each item
+              separatorBuilder: (context, index) => Divider(), // dividers
               itemBuilder: (context, index) {
                 final teammateId = teammates[index];
                 return FutureBuilder<DocumentSnapshot>(
@@ -557,13 +557,13 @@ Widget _buildTeammatesList() {
                       return Text('');
                     } else {
                       final userData = userSnapshot.data!.data()! as Map<String, dynamic>;
-                      final name = userData['name'] ?? ''; // Use name instead of email
+                      final name = userData['name'] ?? ''; // use name instead of email
                       return ListTile(
                           title: Row(
                           children: [
                             GestureDetector(
                               onTap: () async {
-                                _showProfile(context, userData); // Call _showProfile on eye icon tap
+                                _showProfile(context, userData); // show profile when someone clicks on the eye icon
                               },
                               child: Icon(Icons.remove_red_eye),
                             ),
@@ -572,7 +572,7 @@ Widget _buildTeammatesList() {
                           ],
                         ),
                         onTap: () {
-                          _showProfile(context, userData);
+                          _showProfile(context, userData); // show the profile
                         }
                       );
                     }
@@ -588,7 +588,7 @@ Widget _buildTeammatesList() {
 }
 
 Widget _buildLikersList() {
-  final docRef = FirebaseFirestore.instance.collection('published_projects').doc(widget.projectId);
+  final docRef = FirebaseFirestore.instance.collection('published_projects').doc(widget.projectId); // show the published projects
   return Container(
     height: 100,
     child: Scrollbar(
@@ -810,9 +810,9 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
                 Container(
                   height: 150,
                   child: Scrollbar(
-                    thumbVisibility: true, // Ensure the scrollbar is always visible
-                    thickness: 8, // Set the thickness of the scrollbar
-                    radius: Radius.circular(4), // Set the radius of the scrollbar
+                    thumbVisibility: true, // scrollbar shows up
+                    thickness: 8, // thickness of bar
+                    radius: Radius.circular(4), 
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
                       child: Text(
@@ -847,6 +847,7 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
   );
 }
 
+  // for inside the profile
   List<Widget> _buildTagsSkill(String skillsText) {
     final tags = skillsText.split(',').map((tag) => tag.trim()).toList();
     return tags.map((tag) {
@@ -862,6 +863,7 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
     }).toList();
   }
 
+  // for project details
   List<Widget> _buildTags() {
     final tags = _filtersController.text.split(',').map((tag) => tag.trim()).toList();
     return tags.map((tag) {
@@ -876,6 +878,7 @@ Widget _buildProfileItem(String label, String value, {bool isBiography = false})
       );
     }).toList();
   } 
+
 
   Future<void> _sendNotification(String userId, String message, String projectId, {bool isAccepted = true}) async { 
     DocumentSnapshot projectSnapshot = await FirebaseFirestore.instance

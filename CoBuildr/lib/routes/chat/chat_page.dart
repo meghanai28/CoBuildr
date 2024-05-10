@@ -48,18 +48,18 @@ class _ChatPageState extends State<ChatPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 3,
         onTap: (index) {
-          // Handle bottom navigation bar taps
+          // nav bar
           if (index == 0) {
-            // Navigate to Dashboard page
+            // Dashboard page
             Navigator.pushNamed(context, '/dashboard');
           } else if (index == 1) {
-            // Navigate to Create Project page
+            // Create Project page
             Navigator.pushNamed(context, '/createProject');
           } else if (index == 2) {
-            // Navigate to Your Projects page
+            // Projects page
             Navigator.pushNamed(context, '/yourProjects');
           } else if (index == 4) {
-            // Navigate to Settings page
+            // Settings page
             Navigator.pushNamed(context, '/editProfile');
           }
         },
@@ -70,7 +70,7 @@ class _ChatPageState extends State<ChatPage> {
           _buildNavItem(Icons.message, 'Messages'),
           _buildNavItem(Icons.settings, 'Settings'),
         ],
-        type: BottomNavigationBarType.fixed, // Ensure icons remain visible even when not selected
+        type: BottomNavigationBarType.fixed,  // icons fixed
       ),
     );
   }
@@ -78,7 +78,7 @@ class _ChatPageState extends State<ChatPage> {
   // build list of users that user is currently chatting with
   Widget _buildUserList() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding
+      padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding
       child : Container( // create container widget
         padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0), // padding
         decoration: BoxDecoration( // color decoration
@@ -103,7 +103,7 @@ class _ChatPageState extends State<ChatPage> {
             Expanded(
               child: ScrollbarTheme(
                 data: ScrollbarThemeData(
-                  thumbVisibility: MaterialStateProperty.all<bool>(true),// Adjust the thickness of the scrollbar
+                  thumbVisibility: MaterialStateProperty.all<bool>(true),// make show scroll bar shows up
                 ),
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance.collection('chat_rooms').orderBy('chatTimestamp', descending: true).snapshots(), // value that changes over time so we use stream builder (a dynamic list)
