@@ -112,6 +112,13 @@ class _SignupPageState extends State<SignupPage> {
         return;
       } // mistype
 
+      if (!_emailController.text.endsWith('.edu')) {
+      setState(() {
+        _message = 'Please use a valid .edu email address';
+      });
+      return;
+    }
+
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
       final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
