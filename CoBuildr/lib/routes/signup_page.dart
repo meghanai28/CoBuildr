@@ -112,16 +112,23 @@ class _SignupPageState extends State<SignupPage> {
         return;
       } // mistype
 
+      if (!_emailController.text.endsWith('.edu')) {
+      setState(() {
+        _message = 'Please use a valid .edu email address';
+      });
+      return;
+    }
+
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
       final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email, password: password
       ); //create user credential
 
-      await userCredential.user!.sendEmailVerification();
+      //await userCredential.user!.sendEmailVerification();
 
       setState(() {
-        _message = 'Account created successfully. Verification email sent.';
+        _message = 'Account created successfully.';
       });
 
       UserProfile newUser = UserProfile (
@@ -134,8 +141,12 @@ class _SignupPageState extends State<SignupPage> {
       // save this information into the user database
       await _firestore.collection('users').doc(userCredential.user!.uid).set(newUser.toMap());
 
-      // redirect to log-in page after sign-up
-      Navigator.pushReplacementNamed(context, '/login');
+      // Redirect based on user type
+      if (_selectedUserType == 'Student') {
+        Navigator.pushReplacementNamed(context, '/editProfile');
+      } else if (_selectedUserType == 'Advisor') {
+        Navigator.pushReplacementNamed(context, '/advisor/advisor_setting');
+      }
 
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

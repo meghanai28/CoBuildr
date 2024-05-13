@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:namer_app/services/chat_service.dart';
+import 'package:intl/intl.dart';
 
 class ChatDetails extends StatefulWidget {
   final String recieverUserEmail; //get recieverUserEmail
@@ -99,49 +100,90 @@ class _ChatDetailsState extends State<ChatDetails> {
     // align 
 
     var align = (data['senderId'] == _firebaseAuth.currentUser!.uid) ? 
-    Alignment.centerRight: Alignment.centerLeft; // select alignment based on if the senderId is the current viewer in session or not 
+    CrossAxisAlignment.end: CrossAxisAlignment.start; // select alignment based on if the senderId is the current viewer in session or not 
     // this helps us determine if the user is a reciever or sender in each specific chatroom (this is for each message in the chat)
 
-    return Container(
-      alignment: align, // align based on this
+    var color = (data['senderId'] == _firebaseAuth.currentUser!.uid) ? 
+    Colors.purple : Colors.grey; // select color based on that
+
+    return Container( // create container for message
+      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0), // add padding
       child: Column(
+        crossAxisAlignment: align, // align left or right
         children: [
-          Text(data['senderEmail']),
-          Text(data['message'])
+          Container(
+            decoration: BoxDecoration(
+              color: color, // color based on sender/reciever
+              borderRadius: BorderRadius.circular(8.0), // make circle like messages
+            ),
+            padding: EdgeInsets.all(12.0), // add padding
+            child: Text(
+              data['message'], // the message 
+              style: TextStyle(color: Colors.white), // in white
+            ),
+          ),
+          SizedBox(height: 4.0), // spacing
+          Text(
+            data['senderEmail'], // the email
+            style: TextStyle(color: Colors.black), // black
+          ),
+          SizedBox(height: 1.0),
+          Text(
+            DateFormat.yMd().add_jm().format(data['timestamp'].toDate()), // show time stamp under each message
+            style: TextStyle(color: Colors.black, fontSize: 10), // black
+          ),
         ],
-        ),
+      ),
     );
 
   }
 
 
   // build message input
-  Widget _buildMessageInput()
-  {
-    return Row(
-      children: [
-        //text field
-        Expanded(
-          child: TextField(
-            controller: _messageController, // let user input their message
-            obscureText: false, // let them see it
-            decoration: InputDecoration(
-                      labelText: 'Message',
+  Widget _buildMessageInput() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // add padding
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start, // align
+        children: [
+          Expanded(
+            child: LimitedBox(
+              maxHeight: 60, // set the height to 60
+              child: TextField(
+                controller: _messageController,
+                maxLines: 3, // limit the number of lines to 3 so that the scrolling is aparent
+                decoration: InputDecoration(
+                  labelText: 'Message', // label
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0), // circle radius
+                  ),
+                  contentPadding: EdgeInsets.all(12.0), // add padding
+                ),
+              ),
             ),
           ),
-          
-        ),
-
-        // send button
-        IconButton(
-          onPressed: sendMessage, // call sendMessage method when the arrow is pressed
-          icon: const Icon(
-            Icons.arrow_upward,
-            size:40,
-            )
+          SizedBox(width: 8.0), // ad a box between text message and the send button
+          Material(
+            color: Colors.transparent, // make transparent
+            child: InkWell(
+              onTap: sendMessage, // send message on icon click
+              borderRadius: BorderRadius.circular(20.0), // make circle
+              child: Container(
+                padding: EdgeInsets.all(12.0), // add padding
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0), // make circle
+                  color: Colors.purple, // add color
+                ),
+                child: Icon(
+                  Icons.arrow_upward, // up arrow (show eneter)
+                  size: 24, // nice size
+                  color: Colors.white, // make white inside the purple
+                ),
+              ),
+            ),
           ),
-      ],
-
+        ],
+      ),
     );
   }
 }

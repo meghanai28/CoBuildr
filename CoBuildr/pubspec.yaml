@@ -21,6 +21,7 @@ dependencies:
   image_picker:
   firebase_storage:
   file_picker:
+  intl:
 
 
 dev_dependencies:
@@ -31,3 +32,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true #this file specifies basic info about the app (version, dependencies, assets)
+  assets:
+    - assets/images/logo.png

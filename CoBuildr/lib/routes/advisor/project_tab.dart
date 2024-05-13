@@ -3,36 +3,46 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:namer_app/routes/projects/project_details.dart';
 
+
 class AdvisorProjectsPage extends StatefulWidget {
   @override
   _AdvisorProjectsPageState createState() => _AdvisorProjectsPageState();
 }
 
+
 class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
   int _currentIndex = 2; // Default selected index
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Projects'),
+  title: Center(
+    child: Text(
+      'Your Projects',
+      style: TextStyle(color: Colors.purple), // Making text purple
+    ),
+  ),
         automaticallyImplyLeading: false, // get rid of back button for now (so buggy)
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Currently Advising',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
+  padding: const EdgeInsets.all(8.0),
+  child: Text(
+    'Currently Advising',
+    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.purple), // Making text purple
+  ),
+),
+
+
           Expanded(
             child: _buildProjectList(),
           ),
-          
+         
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -64,6 +74,7 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
     );
   }
 
+
   BottomNavigationBarItem _buildNavItem(IconData icon, String label) {
     return BottomNavigationBarItem(
       icon: Icon(
@@ -74,8 +85,9 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
     );
   }
 
+
  Widget _buildProjectList(){
-    
+   
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
                   .collection('published_projects')
@@ -85,9 +97,11 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
           return Text('Error: ${snapshot.error}'); // show any errors
         }
 
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Text(''); // show loading if the data is still being loaded in
         }
+
 
         final projects = snapshot.data!.docs; //get published projects
         return ListView.builder( // build a list of all projects (like how we see in imessages)
@@ -96,33 +110,38 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
             final projectData = projects[index].data()! as Map<String, dynamic>; // get each project data
             final advisors = projectData['advisors'];
             final projectId = projects[index].id;
-            
-            if(advisors != null && advisors.contains(_auth.currentUser!.uid))
+            final active = projectData['advisorActive'];
+           
+            if(advisors != null && advisors.contains(_auth.currentUser!.uid) && active )
             {
               return ListTile(
                title: _buildProjectTile(projectData['title'], 'Currently Advising',projectId), // the title of the list will be the project name
                
               );
             }
-            else 
+            else
             {
-                return Container(); 
+                return Container();
             }
-            
+           
           }
         );
 
+
       }
-        
+       
     );
   }
 
 
-  
 
-  Widget _buildProjectTile(String projectName, String projectDescription, String projectId) {
+
+ 
+
+
+    Widget _buildProjectTile(String projectName, String projectDescription, String projectId) {
     return ListTile(
-      leading: _buildSquare(), // Add light purple square
+      leading: _buildLightBulb(), // Add lightbulb
       title: Text(
         projectName,
         style: TextStyle(fontWeight: FontWeight.bold), // Make "Project" bold
@@ -130,24 +149,31 @@ class _AdvisorProjectsPageState extends State<AdvisorProjectsPage> {
       subtitle: Text(projectDescription), // Add project description
       onTap: () {
         Navigator.push(
-                  context, // push to the chat details page
+                  context, // push to the project details page
                   MaterialPageRoute(
                     builder: (context) => ProjectDetails(
-                      projectId: projectId, 
-                      owner: false, 
+                      projectId: projectId,
+                      owner: false,
                       published: true
                     )
                   ),
                 );
       },
+      trailing: Icon(
+        Icons.arrow_forward, // arrow icon
+        color: Colors.purple,
+      ),
     );
   }
 
-  Widget _buildSquare() {
-    return Container(
-      width: 50,
-      height: 50,
-      color: Colors.purple[200],
+
+  Widget _buildLightBulb() {
+    return Icon(
+      Icons.lightbulb, // Lightbulb icon
+      color: Colors.yellow, // Set lightbulb color
     );
   }
 }
+
+
+
